@@ -28,7 +28,7 @@ class ListFragment : Fragment() {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
+        val textView: TextView = binding.textList
         listViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }

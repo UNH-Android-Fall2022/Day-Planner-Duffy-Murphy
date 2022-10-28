@@ -32,6 +32,11 @@ class ListFragment : Fragment() {
         listViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
+        val fab = binding.floatingActionButton
+        fab.show()
+//        TODO: Set on click listener
+//        fab.setOnClickListener()
         return root
     }
 

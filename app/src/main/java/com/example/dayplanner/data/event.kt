@@ -7,3 +7,5 @@ data class event(
     val duration: Int,
     val eventName: String
 )
+
+val eventList: ArrayList<event> = ArrayList()

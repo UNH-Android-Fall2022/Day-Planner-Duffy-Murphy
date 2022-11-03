@@ -3,4 +3,7 @@
     <string name="title_list">List</string>
     <string name="title_planner">Planner</string>
     <string name="title_settings">Settings</string>
+
+    <string name="main_planner">Plan out your day!</string>
+    <string name="time">12:00 AM</string>
 </resources>

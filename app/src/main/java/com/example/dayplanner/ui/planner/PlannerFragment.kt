@@ -28,10 +28,6 @@ class PlannerFragment : Fragment() {
         _binding = FragmentPlannerBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textPlanner
-        plannerViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
         return root
     }
 

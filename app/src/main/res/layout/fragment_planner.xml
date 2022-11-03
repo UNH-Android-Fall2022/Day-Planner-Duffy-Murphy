@@ -7,7 +7,7 @@
     tools:context=".ui.planner.PlannerFragment">
 
     <TextView
-        android:id="@+id/text_planner"
+        android:id="@+id/main_text_planner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -15,8 +15,16 @@
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/main_planner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/planner_timeslots"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="40sp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:clipChildren="false"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

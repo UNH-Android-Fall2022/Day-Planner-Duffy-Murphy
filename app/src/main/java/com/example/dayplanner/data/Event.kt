@@ -2,10 +2,10 @@ package com.example.dayplanner.data
 
 import java.util.Date
 
-data class event(
+data class Event(
     val startTime: Date?,
     val duration: Int,
     val eventName: String
 )
 
-val eventList: ArrayList<event> = ArrayList()
+val eventList: ArrayList<Event> = ArrayList()

@@ -1,4 +1,5 @@
 package com.example.dayplanner.ui.planner
 
-class PlannerAdapter {
+
+class PlannerAdapter (private val eventList: ArrayList<PlannerItem>){
 }

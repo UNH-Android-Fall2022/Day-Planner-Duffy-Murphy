@@ -46,7 +46,8 @@ class PlannerFragment : Fragment() {
                     PlannerItem(
                         timeFormat.format(item.startTime),
                         timeFormat.format(Date(item.startTime.time + item.duration)),
-                        item.eventName
+                        item.eventName,
+                        item.duration
                     )
                 )
         }
@@ -65,7 +66,8 @@ class PlannerFragment : Fragment() {
                     PlannerItem(
                         timeFormat.format(item.startTime),
                         timeFormat.format(Date(item.startTime.time + item.duration)),
-                        item.eventName
+                        item.eventName,
+                        item.duration
                     )
                 )
         }

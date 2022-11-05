@@ -40,27 +40,26 @@ class PlannerFragment : Fragment() {
         val eventRecyclerList: ArrayList<PlannerItem> = ArrayList()
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
 
+        val plannerList: ArrayList<Event> = ArrayList()
+
         for(item in eventList){
             if (item.startTime != null)
-                eventRecyclerList.add(
-                    PlannerItem(
-                        timeFormat.format(item.startTime),
-                        timeFormat.format(Date(item.startTime.time + item.duration)),
-                        item.eventName,
-                        item.duration
-                    )
-                )
+                plannerList.add(item)
         }
 
         val testList: ArrayList<Event> = arrayListOf(
             Event(Date(), 60000*15, "Event 1"),
+            Event(Date(Date().time + 60000 * 60), 60000*45, "Event 4"),
             Event(null, 60000*15, "Event 2"),
             Event(Date(), 60000*30, "Event 3"),
-            Event(Date(Date().time + 60000 * 60), 60000*45, "Event 4"),
-            Event(Date(Date().time + 60000 * 60*5), 60000*45, "Event 4")
+            Event(Date(Date().time + 60000 * 60*5), 60000*45, "Event 5")
         )
 
-        for(item in testList){
+        plannerList.addAll(testList)
+
+        plannerList.sortBy { it.startTime }
+
+        for(item in plannerList){
             if (item.startTime != null)
                 eventRecyclerList.add(
                     PlannerItem(

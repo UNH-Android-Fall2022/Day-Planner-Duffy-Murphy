@@ -8,8 +8,13 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentPlannerBinding
+import java.text.DateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PlannerFragment : Fragment() {
 
@@ -18,6 +23,8 @@ class PlannerFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,23 +36,42 @@ class PlannerFragment : Fragment() {
 
         _binding = FragmentPlannerBinding.inflate(inflater, container, false)
         val root: View = binding.root
-// TODO Fix this
-//        val eventRecyclerList: ArrayList<PlannerItem> = ArrayList()
-//
-//        for(item in eventList){
-//            eventRecyclerList.add(
-//                PlannerItem(
-//                    item.startTime,
-//                    workout.name,
-//                    workout.workoutTime.toString()+" Minutes"
-//                )
-//            )
-//        }
-//
-//        mRecyclerView = binding.recyclerViewWorkouts
-//        mRecyclerView.setHasFixedSize(true)
-//        mRecyclerView.layoutManager = LinearLayoutManager(context)
-//        mRecyclerView.adapter = WorkoutAdapter(workoutRecyclerList, this)
+
+        val eventRecyclerList: ArrayList<PlannerItem> = ArrayList()
+        val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
+
+        for(item in eventList){
+            if (item.startTime != null)
+                eventRecyclerList.add(
+                    PlannerItem(
+                        timeFormat.format(item.startTime),
+                        timeFormat.format(Date(item.startTime.time + item.duration)),
+                        item.eventName
+                    )
+                )
+        }
+
+        val testList: ArrayList<Event> = arrayListOf(
+            Event(Date(), 60000*15, "Event 1"),
+            Event(null, 60000*15, "Event 2"),
+            Event(Date(), 60000*30, "Event 3"),
+            Event(Date(Date().time + 60000 * 60), 60000*45, "Event 4"),
+            Event(Date(Date().time + 60000 * 60*5), 60000*45, "Event 4")
+        )
+
+        for(item in testList){
+            if (item.startTime != null)
+                eventRecyclerList.add(
+                    PlannerItem(
+                        timeFormat.format(item.startTime),
+                        timeFormat.format(Date(item.startTime.time + item.duration)),
+                        item.eventName
+                    )
+                )
+        }
+
+        mRecyclerView = binding.plannerEvents
+        mRecyclerView.adapter = PlannerAdapter(eventRecyclerList, this)
 
         return root
     }

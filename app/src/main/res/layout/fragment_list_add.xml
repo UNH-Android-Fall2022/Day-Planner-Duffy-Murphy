@@ -4,22 +4,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.list.ListFragment">
+    tools:context=".ui.list.ListFragment"
+    tools:ignore="ExtraText">
 
-    <TextView
-        android:id="@+id/text_list"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:text="This is actually the List Add Fragment."
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@mipmap/ic_logo"
+        android:layout_marginTop="@dimen/list_add_margin_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleX="3"
+        android:scaleY="3" />
+
+    <EditText
+        android:id="@+id/evt_title"
+        android:textSize="26sp"
+        android:maxLines="1"
+        android:maxLength="50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        android:hint="@string/evt_title" />
+
+    <EditText
+        android:id="@+id/evt_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:inputType="number"
+        android:hint="@string/evt_duration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_title" />"
+
+    <EditText
+        android:id="@+id/evt_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:inputType="time"
+        android:hint="@string/evt_start_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_duration" />
+
+    <TextView
+        android:id="@+id/evt_recurring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:text="@string/evt_recurring"
+        app:layout_constraintEnd_toStartOf="@id/spinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_start_time" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/evt_recurring"
+        app:layout_constraintBottom_toBottomOf="@+id/evt_recurring" />
+
+    <EditText
+        android:id="@+id/evt_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:hint="@string/evt_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_recurring" />
+
+    <Button
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/list_add_button_spacing"
+        android:text="Create"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_location" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 <!--Compare these later-->

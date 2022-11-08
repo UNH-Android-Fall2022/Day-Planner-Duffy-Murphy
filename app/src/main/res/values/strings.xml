@@ -4,4 +4,14 @@
     <string name="title_planner">Planner</string>
     <string name="title_settings">Settings</string>
     <string name="fab_desc">Add Events</string>
+    <string name="evt_title">Event Title*</string>
+    <string name="evt_start_time">Start Time</string>
+    <string name="evt_duration">Event Duration (Minutes)*</string>
+    <string name="evt_recurring">Recurring Event?*</string>
+    <string name="evt_location">Event Location</string>
+
+    <string-array name="evt_recurring_options">
+        <item>No</item>
+        <item>Yes</item>
+    </string-array>
 </resources>

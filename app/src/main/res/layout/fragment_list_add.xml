@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.list.ListFragment"
+    tools:ignore="ExtraText">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_logo"
+        android:layout_marginTop="@dimen/list_add_margin_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleX="3"
+        android:scaleY="3" />
+
+    <EditText
+        android:id="@+id/evt_title"
+        android:textSize="26sp"
+        android:maxLines="1"
+        android:maxLength="50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        android:hint="@string/evt_title" />
+
+    <EditText
+        android:id="@+id/evt_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:inputType="number"
+        android:hint="@string/evt_duration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_title" />"
+
+    <TextView
+        android:id="@+id/evt_start_time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:text="@string/start_time"
+        app:layout_constraintEnd_toStartOf="@+id/spinner_start_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_duration" />
+
+    <Spinner
+        android:id="@+id/spinner_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/evt_start_time_text"
+        app:layout_constraintBottom_toBottomOf="@+id/evt_start_time_text" />
+
+    <TimePicker
+        android:id="@+id/evt_start_time"
+        android:layout_width="260dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="0dp"
+        android:scaleY="0.5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_start_time_text" />
+
+    <TextView
+        android:id="@+id/evt_recurring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:text="@string/evt_recurring"
+        app:layout_constraintEnd_toStartOf="@id/spinner_recurring"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_start_time" />
+
+    <Spinner
+        android:id="@+id/spinner_recurring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/evt_recurring"
+        app:layout_constraintBottom_toBottomOf="@+id/evt_recurring" />
+
+    <EditText
+        android:id="@+id/evt_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_add_spacing"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:hint="@string/evt_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_recurring" />
+
+    <Button
+        android:id="@+id/list_add_submit"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/list_add_button_spacing"
+        android:text="@string/create"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_location" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+<!--Compare these later-->
+<!--</androidx.coordinatorlayout.widget.CoordinatorLayout>-->

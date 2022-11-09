@@ -1,6 +1,5 @@
 package com.example.dayplanner
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -14,16 +13,17 @@ import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.ActivityMainBinding
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.auth.ktx.auth
 import java.util.*
+
+
+val TAG = "DayPlanner"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    //TODO Change user type when firebase auth is implemented
-    //Currently hardcoded, will be changed when firebase auth (a supplemental feature) is working
-    private lateinit var user: String
+
     private val db = Firebase.firestore
-    private val TAG = "DayPlanner"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,17 +46,18 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        user = "N5oUSONzTrnzRsG2czo5"
-        getEvents()
+        val user = Firebase.auth.currentUser
+        if (user != null)
+            getEvents(user.uid)
     }
 
     // TODO Finish this function. It currently only logs data instead of storing
-    private fun getEvents () {
+    private fun getEvents(uid: String) {
+
         Log.d(TAG, "Getting already created events from Firestore")
-        db.collection("Users/${user}/events").get()
+        db.collection("Users/${uid}/events").get()
             .addOnSuccessListener { documents ->
                 Log.d(TAG, "Document request succeeded")
-
                 val calendar: Calendar = Calendar.getInstance()
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)

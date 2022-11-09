@@ -45,7 +45,6 @@ class ListFragment : Fragment() {
         fab.show()
 //        TODO: Set on click listener
         fab.setOnClickListener() {
-            // fab.hide()
             val action = ListFragmentDirections.actionNavigationListToNavigationListAdd()
             findNavController().navigate(action)
         }

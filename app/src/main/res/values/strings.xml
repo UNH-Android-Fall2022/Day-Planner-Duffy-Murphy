@@ -12,6 +12,8 @@
     <string name="evt_duration">Event Duration (Minutes)*</string>
     <string name="evt_recurring">Recurring Event?*</string>
     <string name="evt_location">Event Location</string>
+    <string name="start_time">Start Time?</string>
+    <string name="create">Create</string>
 
     <string-array name="evt_recurring_options">
         <item>No</item>

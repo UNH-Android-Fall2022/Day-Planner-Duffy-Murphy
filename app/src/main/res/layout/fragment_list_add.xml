@@ -46,18 +46,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/evt_title" />"
 
-    <EditText
-        android:id="@+id/evt_start_time"
+    <TextView
+        android:id="@+id/evt_start_time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_add_spacing"
         android:textSize="26sp"
-        android:textAlignment="center"
-        android:inputType="time"
-        android:hint="@string/evt_start_time"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/start_time"
+        app:layout_constraintEnd_toStartOf="@+id/spinner_start_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/evt_duration" />
+
+    <Spinner
+        android:id="@+id/spinner_start_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/evt_start_time_text"
+        app:layout_constraintBottom_toBottomOf="@+id/evt_start_time_text" />
+
+    <TimePicker
+        android:id="@+id/evt_start_time"
+        android:layout_width="260dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="0dp"
+        android:scaleY="0.5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/evt_start_time_text" />
 
     <TextView
         android:id="@+id/evt_recurring"
@@ -67,12 +84,12 @@
         android:textSize="26sp"
         android:textAlignment="center"
         android:text="@string/evt_recurring"
-        app:layout_constraintEnd_toStartOf="@id/spinner"
+        app:layout_constraintEnd_toStartOf="@id/spinner_recurring"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/evt_start_time" />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/spinner_recurring"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
@@ -93,10 +110,11 @@
         app:layout_constraintTop_toBottomOf="@id/evt_recurring" />
 
     <Button
+        android:id="@+id/list_add_submit"
         android:layout_width="@dimen/button_width"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="@dimen/list_add_button_spacing"
-        android:text="Create"
+        android:text="@string/create"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/evt_location" />

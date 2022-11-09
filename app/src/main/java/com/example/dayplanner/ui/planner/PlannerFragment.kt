@@ -31,9 +31,6 @@ class PlannerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val plannerViewModel =
-            ViewModelProvider(this).get(PlannerViewModel::class.java)
-
         _binding = FragmentPlannerBinding.inflate(inflater, container, false)
         val root: View = binding.root
 

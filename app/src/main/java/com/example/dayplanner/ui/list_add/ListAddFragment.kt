@@ -16,6 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.R
 import com.example.dayplanner.databinding.FragmentListAddBinding
+import com.example.dayplanner.ui.planner.PlannerItem
+import com.example.dayplanner.data.Event
+import com.example.dayplanner.data.eventList
 
 
 class ListAddFragment : Fragment() {
@@ -102,12 +105,12 @@ class ListAddFragment : Fragment() {
 
         val button = binding.listAddSubmit
         button.setOnClickListener() {
-            val title = binding.evtTitle.text
+            val title = binding.evtTitle.text.toString()
             val duration = binding.evtDuration.text.toString()
             var startTime = ""
-            if (timePicker.visibility == View.VISIBLE) {
-                startTime = timePicker.hour.toString() + ":" + timePicker.minute.toString()
-            }
+//            if (timePicker.visibility == View.VISIBLE) {
+//                startTime = timePicker.hour.toString() + ":" + timePicker.minute.toString()
+//            }
             val recurring = binding.spinnerRecurring.selectedItem.toString()
             val location = binding.evtLocation.text.toString()
 
@@ -129,6 +132,9 @@ class ListAddFragment : Fragment() {
             } else {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
+                // TODO: Make startTime a date object or a string
+                val event: Event = Event(null, duration.toInt(), title.toString())
+                eventList.add(event)
             }
         }
         return root
@@ -139,7 +145,7 @@ class ListAddFragment : Fragment() {
         _binding = null
     }
 
-    fun buildAlertDialog(context: Context?, title: String, message: String) {
+    private fun buildAlertDialog(context: Context?, title: String, message: String) {
         // The following alertdialog is adapted from https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android
         AlertDialog.Builder(context)
             .setTitle(title)

@@ -15,7 +15,17 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.dayplanner.data.Event
+import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
+import com.example.dayplanner.databinding.FragmentPlannerBinding
+import com.example.dayplanner.ui.planner.PlannerAdapter
+import com.example.dayplanner.ui.planner.PlannerItem
+import com.example.dayplanner.ui.planner.PlannerViewModel
+import java.text.DateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ListFragment : Fragment() {
@@ -24,26 +34,34 @@ class ListFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val listViewModel =
-            ViewModelProvider(this).get(ListViewModel::class.java)
+
 
         _binding = FragmentListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textList
-        listViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        val eventRecyclerList: ArrayList<ListItem> = ArrayList()
+        val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
+
+        val eventList: ArrayList<Event> = ArrayList()
+
+        for(item in eventList) {
+            if (item.startTime == null)
+                eventRecyclerList.add(ListItem(item.eventName, item.duration))
         }
+
+        mRecyclerView = binding.listEvents
+        mRecyclerView.adapter = ListAdapter(eventRecyclerList, this)
+
 
         val fab = binding.floatingActionButton
         fab.show()
-//        TODO: Set on click listener
         fab.setOnClickListener() {
             val action = ListFragmentDirections.actionNavigationListToNavigationListAdd()
             findNavController().navigate(action)

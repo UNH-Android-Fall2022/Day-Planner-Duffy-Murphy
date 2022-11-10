@@ -1,21 +1,27 @@
 package com.example.dayplanner.ui.list_add
 
 import android.app.AlertDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import android.widget.TimePicker
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.R
 import com.example.dayplanner.databinding.FragmentListAddBinding
+import com.example.dayplanner.ui.planner.PlannerItem
+import com.example.dayplanner.data.Event
+import com.example.dayplanner.data.eventList
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class ListAddFragment : Fragment() {
@@ -76,22 +82,32 @@ class ListAddFragment : Fragment() {
                 spinnerStartTime.adapter = adapter
             }
         }
-        val timePicker: TimePicker = binding.evtStartTime
-        // TODO: Figure out how to let the user edit the timepicker.
-//        timePicker.setOnTimeChangedListener() {
-//
-//        }
+
+        var startTime: Date? = Date()
+        val timeTextView = binding.evtStartTime
+        // This listener is used below with the spinner
+        // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
+        fun timePickerListener() =
+            TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+                val theString = "%02d:%02d".format(hourOfDay, minute)
+                timeTextView.text = theString
+                startTime = SimpleDateFormat("HH:mm").parse(theString)
+            }
+
         spinnerStartTime.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
                 spinnerStartTime.setSelection(pos)
                 spinnerStartTime.tooltipText = parent.getItemAtPosition(pos).toString()
                 if (spinnerStartTime.tooltipText == "Yes") {
-                    timePicker.visibility = View.VISIBLE
-                    timePicker.isEnabled = true // it still doesn't work
-
+                    val timePicker: TimePickerDialog = TimePickerDialog (context,
+                        timePickerListener(),
+                        Calendar.HOUR_OF_DAY,
+                        Calendar.MINUTE,
+                        false)
+                    timePicker.show()
+                    timeTextView.visibility = View.VISIBLE
                 } else {
-                    timePicker.visibility = View.GONE
-                    timePicker.isEnabled = true // it still doesn't work
+                    timeTextView.visibility = View.GONE
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -102,11 +118,11 @@ class ListAddFragment : Fragment() {
 
         val button = binding.listAddSubmit
         button.setOnClickListener() {
-            val title = binding.evtTitle.text
+            val title = binding.evtTitle.text.toString()
             val duration = binding.evtDuration.text.toString()
-            var startTime = ""
-            if (timePicker.visibility == View.VISIBLE) {
-                startTime = timePicker.hour.toString() + ":" + timePicker.minute.toString()
+
+            if (binding.spinnerStartTime.tooltipText != "Yes") {
+                startTime = null
             }
             val recurring = binding.spinnerRecurring.selectedItem.toString()
             val location = binding.evtLocation.text.toString()
@@ -120,15 +136,11 @@ class ListAddFragment : Fragment() {
                     "Invalid Event Duration",
                     "Please enter an event duration that is longer than 0 minutes and shorter than 24 hours!"
                 )
-            } else if (startTime.isEmpty() || startTime.toInt() > 24*60) {
-                buildAlertDialog(
-                    context,
-                    "Invalid Start Time",
-                    "Please enter a start time that is greater than 0 minutes and shorter than 24 hours!"
-                )
             } else {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
+                val event: Event = Event(startTime, duration.toInt() * 60000, title) // title is already title.toString()
+                eventList.add(event)
             }
         }
         return root
@@ -139,7 +151,7 @@ class ListAddFragment : Fragment() {
         _binding = null
     }
 
-    fun buildAlertDialog(context: Context?, title: String, message: String) {
+    private fun buildAlertDialog(context: Context?, title: String, message: String) {
         // The following alertdialog is adapted from https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android
         AlertDialog.Builder(context)
             .setTitle(title)

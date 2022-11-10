@@ -63,7 +63,6 @@ class ListFragment : Fragment() {
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
 
         for(item in eventList) {
-            Log.d("my special tag", "Added an item!!")
             eventRecyclerList.add(ListItem(item.eventName))
         }
 
@@ -73,7 +72,6 @@ class ListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("my special tag", "Updating recycler view!")
         updateRecyclerView()
     }
 

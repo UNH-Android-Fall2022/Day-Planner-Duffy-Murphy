@@ -94,7 +94,6 @@ class ListAddFragment : Fragment() {
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
         fun timePickerListener() =
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-
                 val calendar: Calendar = Calendar.getInstance()
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)

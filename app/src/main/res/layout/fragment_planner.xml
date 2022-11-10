@@ -25,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="40sp"
+        android:paddingBottom="50sp"
         tools:listitem="@layout/planner_item"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:clipChildren="false"/>

@@ -95,7 +95,9 @@ class ListAddFragment : Fragment() {
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
                 val theString = "%02d:%02d".format(hourOfDay, minute)
                 timeTextView.text = theString
-                startTime = SimpleDateFormat("HH:mm").parse(theString)
+
+                val timeinMilli: Long = Date().time + SimpleDateFormat("HH:mm").parse(theString).time
+                startTime = Date(timeinMilli)
             }
 
         spinnerStartTime.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

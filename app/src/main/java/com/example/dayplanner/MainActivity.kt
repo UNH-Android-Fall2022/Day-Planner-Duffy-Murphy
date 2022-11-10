@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
             getEvents(user.uid)
     }
 
-    // TODO Finish this function. It currently only logs data instead of storing
     private fun getEvents(uid: String) {
 
         Log.d(TAG, "Getting already created events from Firestore")

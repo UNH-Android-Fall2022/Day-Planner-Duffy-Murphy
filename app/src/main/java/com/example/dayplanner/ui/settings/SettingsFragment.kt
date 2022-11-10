@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.dayplanner.TAG
 import com.example.dayplanner.data.Event
+import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentSettingsBinding
 import com.firebase.ui.auth.AuthUI
@@ -63,7 +64,7 @@ class SettingsFragment : Fragment() {
     }
 
     val providers = arrayListOf(
-        AuthUI.IdpConfig.EmailBuilder().build(),
+        //AuthUI.IdpConfig.EmailBuilder().build(),
         AuthUI.IdpConfig.GoogleBuilder().build())
 
 
@@ -71,14 +72,15 @@ class SettingsFragment : Fragment() {
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK) {
             // Successfully signed in
-            val user = FirebaseAuth.getInstance().currentUser
+//            val user = FirebaseAuth.getInstance().currentUser
 //            Log.d(TAG, "Sign in successful. Checking if user already exists")
 //            db.collection("Users").document("${user?.uid}").get()
 //                .addOnSuccessListener { document ->
 //                    Log.d(TAG, "User exists. No modifications necessary")
 //                }
 //                .addOnFailureListener { exception ->
-//                    Log.w(TAG, "Error getting documents: ", exception)
+//                    Log.d(TAG, "User probably does not exist, adding user")
+//                    db.collection("Users").document("${user?.uid}").set(User())
 //                }
         } else {
             // Sign in failed. If response is null the user canceled the

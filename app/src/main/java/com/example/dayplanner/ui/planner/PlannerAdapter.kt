@@ -35,6 +35,7 @@ class PlannerAdapter (
         holder.startTime.text = startTime
         holder.endTime.text = endTime
         holder.name.text = name
+        //Card height changes based on the duration of the event
         holder.view.minHeight = duration / 10000
 
         holder.itemView.setOnClickListener {

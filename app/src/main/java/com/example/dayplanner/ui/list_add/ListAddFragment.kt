@@ -16,10 +16,14 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.R
+import com.example.dayplanner.TAG
 import com.example.dayplanner.databinding.FragmentListAddBinding
 import com.example.dayplanner.ui.planner.PlannerItem
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -141,6 +145,12 @@ class ListAddFragment : Fragment() {
                 findNavController().navigate(action)
                 val event: Event = Event(startTime, duration.toInt() * 60000, title) // title is already title.toString()
                 eventList.add(event)
+
+                val user = Firebase.auth.currentUser
+                if (user != null)
+                    Firebase.firestore.collection("Users/${user.uid}/events").add(event)
+                        .addOnSuccessListener { Log.d(TAG, "Event successfully written!") }
+                        .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
             }
         }
         return root

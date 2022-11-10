@@ -24,15 +24,13 @@ class ListAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.planner_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
 
         return ViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int){
-        val (name, duration) = eventList[position]
-
-        holder.name.text = name
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.name.text = eventList[position].eventName
 //        holder.view.minHeight = duration / 10000
 
         holder.itemView.setOnClickListener {

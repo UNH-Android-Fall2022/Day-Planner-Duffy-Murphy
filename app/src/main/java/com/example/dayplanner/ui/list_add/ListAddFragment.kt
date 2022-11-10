@@ -24,6 +24,7 @@ import com.example.dayplanner.data.eventList
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -93,11 +94,14 @@ class ListAddFragment : Fragment() {
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
         fun timePickerListener() =
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-                val theString = "%02d:%02d".format(hourOfDay, minute)
-                timeTextView.text = theString
 
-                val timeinMilli: Long = Date().time + SimpleDateFormat("HH:mm").parse(theString).time
-                startTime = Date(timeinMilli)
+                val calendar: Calendar = Calendar.getInstance()
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                calendar.set(Calendar.SECOND, 0)
+
+                startTime = calendar.time
+                timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime)
             }
 
         spinnerStartTime.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

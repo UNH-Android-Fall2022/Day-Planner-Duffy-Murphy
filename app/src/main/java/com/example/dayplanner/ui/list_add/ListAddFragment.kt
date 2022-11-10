@@ -27,6 +27,7 @@ import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.floor
 
 
 class ListAddFragment : Fragment() {
@@ -94,7 +95,6 @@ class ListAddFragment : Fragment() {
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
         fun timePickerListener() =
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-
                 val calendar: Calendar = Calendar.getInstance()
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
@@ -129,7 +129,8 @@ class ListAddFragment : Fragment() {
         val button = binding.listAddSubmit
         button.setOnClickListener() {
             val title = binding.evtTitle.text.toString()
-            val duration = binding.evtDuration.text.toString()
+            // duration is in units of milliseconds for compatibility with the Date library
+            val duration = binding.evtDuration.text.toString().toInt() * 60000
 
             if (binding.spinnerStartTime.tooltipText != "Yes") {
                 startTime = null
@@ -137,19 +138,58 @@ class ListAddFragment : Fragment() {
             val recurring = binding.spinnerRecurring.selectedItem.toString()
             val location = binding.evtLocation.text.toString()
 
+            var isValidEvent = true
 
+            // Validate events:
+            // Check for empty title
+            // Check for empty event duration, note that the user can only enter numbers.
+            // Check if event duration is longer than 24 hours (this is not the app for scheduling such an event)
+            // Check if the event overlaps with a pre-existing event.
             if (title.isEmpty()) {
                 buildAlertDialog(context,"Missing Event Title", "Please enter an event title!")
-            } else if (duration.isEmpty() || duration.toInt() > 24*60) {
+                isValidEvent = false
+            } else if (binding.evtDuration.toString().isEmpty() || duration > 24*60*60*1000) { // Don't allow events that are longer than 24 hours
                 buildAlertDialog(
                     context,
                     "Invalid Event Duration",
                     "Please enter an event duration that is longer than 0 minutes and shorter than 24 hours!"
                 )
-            } else {
+                isValidEvent = false
+            } else if (startTime != null) {
+                // Validate event times
+                for (event in eventList) {
+                    if (event.startTime != null) {
+                        val eventStart = event.startTime.time
+                        val eventEnd = event.startTime.time + event.duration
+                        val currentStart = startTime!!.time
+                        val currentEnd = startTime!!.time + duration
+                        // I made sure that startTime is not null but I was still forced to add the "!!"
+                        // I do not trust the range check that the compiler suggests
+                        if (eventStart < currentStart && eventEnd > currentStart) {
+                            // This event has a start time that is contained within the duration of a pre-existing event
+                            val startDelay: Int = ((eventEnd - currentStart) / 60000).toInt() + 1
+                            buildAlertDialog(context,"Time Conflict",
+                                "There is a time conflict with this event and other event(s)! " +
+                                        "This event would need to start " + startDelay.toString() + " minutes later.")
+                            isValidEvent = false
+                            break
+                        } else if (eventStart < currentEnd && eventEnd > currentEnd) {
+                            // This event has an end time that is contained within the duration of a pre-existing event
+                            val speedUp: Int = ((currentEnd - eventStart) / 60000).toInt() + 1
+                            buildAlertDialog(context,"Time Conflict",
+                                "There is a time conflict with this event and other event(s)! " +
+                                        "This event would need to end " + speedUp.toString() + " minutes sooner.")
+                            isValidEvent = false
+                            break
+                        }
+                    }
+                }
+            }
+
+            if (isValidEvent) {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
-                val event: Event = Event(startTime, duration.toInt() * 60000, title) // title is already title.toString()
+                val event: Event = Event(startTime, duration, title) // title is already title.toString()
                 eventList.add(event)
 
                 val user = Firebase.auth.currentUser

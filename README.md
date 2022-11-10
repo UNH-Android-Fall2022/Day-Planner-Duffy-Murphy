@@ -7,7 +7,7 @@ Features:
 ---------
 -Sign-in with Firebase auth.
 -Multi-fragment navigation views.
-
+-Streamlined event creation with TimePicker
 
 Features in Progress:
 ---------------------

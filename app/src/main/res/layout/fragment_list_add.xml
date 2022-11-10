@@ -53,16 +53,17 @@
         android:layout_marginTop="@dimen/list_add_spacing"
         android:textSize="26sp"
         android:text="@string/start_time"
-        app:layout_constraintEnd_toStartOf="@+id/spinner_start_time"
+        app:layout_constraintEnd_toStartOf="@+id/switch_start_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/evt_duration" />
 
-    <Spinner
-        android:id="@+id/spinner_start_time"
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_start_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:textSize="26sp"
+        android:layout_marginBottom="-7dp"
+        android:textSize="20sp"
+        android:text="No"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/evt_start_time_text"
         app:layout_constraintBottom_toBottomOf="@+id/evt_start_time_text" />
@@ -86,15 +87,17 @@
         android:textSize="26sp"
         android:textAlignment="center"
         android:text="@string/evt_recurring"
-        app:layout_constraintEnd_toStartOf="@id/spinner_recurring"
+        app:layout_constraintEnd_toStartOf="@id/switch_recurring"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/evt_start_time" />
 
-    <Spinner
-        android:id="@+id/spinner_recurring"
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_recurring"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="-7dp"
+        android:text="No"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/evt_recurring"
         app:layout_constraintBottom_toBottomOf="@+id/evt_recurring" />

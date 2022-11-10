@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.CompoundButton
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -21,6 +21,7 @@ import com.example.dayplanner.databinding.FragmentListAddBinding
 import com.example.dayplanner.ui.planner.PlannerItem
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -47,49 +48,17 @@ class ListAddFragment : Fragment() {
         _binding = FragmentListAddBinding.inflate(inflater, container, false)
         val root: View = binding.root
         // The following is adapted from https://developer.android.com/develop/ui/views/components/spinner
-        val spinnerRecurring: Spinner = binding.spinnerRecurring
-        context?.let {
-            ArrayAdapter.createFromResource(
-                it,
-                R.array.evt_recurring_options,
-                android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                //
-                // Specify the layout to use when the list of choices appears
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                // Apply the adapter to the spinner
-                spinnerRecurring.adapter = adapter
+        val switchRecurring: SwitchMaterial = binding.switchRecurring
+        switchRecurring.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                switchRecurring.text = "Yes"
+            } else {
+                switchRecurring.text = "No"
             }
-        }
-        spinnerRecurring.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                spinnerRecurring.setSelection(pos)
-                spinnerRecurring.tooltipText = parent.getItemAtPosition(pos).toString()
-            }
+        })
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                spinnerRecurring.setSelection(0)
-                spinnerRecurring.tooltipText = parent.getItemAtPosition(0).toString()
-            }
-        }
-
-
-        val spinnerStartTime: Spinner = binding.spinnerStartTime
-        context?.let {
-            ArrayAdapter.createFromResource(
-                it,
-                R.array.evt_recurring_options,
-                android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                //
-                // Specify the layout to use when the list of choices appears
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                // Apply the adapter to the spinner
-                spinnerStartTime.adapter = adapter
-            }
-        }
-
-        var startTime: Date? = Date()
+        var startTime: Date? = null
         val timeTextView = binding.evtStartTime
         // This listener is used below with the spinner
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
@@ -104,27 +73,24 @@ class ListAddFragment : Fragment() {
                 timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime)
             }
 
-        spinnerStartTime.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                spinnerStartTime.setSelection(pos)
-                spinnerStartTime.tooltipText = parent.getItemAtPosition(pos).toString()
-                if (spinnerStartTime.tooltipText == "Yes") {
-                    val timePicker: TimePickerDialog = TimePickerDialog (context,
-                        timePickerListener(),
-                        Calendar.HOUR_OF_DAY,
-                        Calendar.MINUTE,
-                        false)
-                    timePicker.show()
-                    timeTextView.visibility = View.VISIBLE
-                } else {
-                    timeTextView.visibility = View.GONE
-                }
+        val switchStartTime: SwitchMaterial = binding.switchStartTime
+        switchStartTime.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                switchStartTime.text = "Yes"
+                val timePicker: TimePickerDialog = TimePickerDialog (context,
+                    timePickerListener(),
+                    Calendar.HOUR_OF_DAY,
+                    Calendar.MINUTE,
+                    false)
+                timePicker.show()
+                timeTextView.visibility = View.VISIBLE
+            } else {
+                timeTextView.visibility = View.GONE
+                switchStartTime.text = "No"
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                spinnerStartTime.setSelection(0)
-                spinnerStartTime.tooltipText = parent.getItemAtPosition(0).toString()
-            }
-        }
+        })
+
 
         val button = binding.listAddSubmit
         button.setOnClickListener() {
@@ -132,10 +98,11 @@ class ListAddFragment : Fragment() {
             // duration is in units of milliseconds for compatibility with the Date library
             val duration = binding.evtDuration.text.toString().toInt() * 60000
 
-            if (binding.spinnerStartTime.tooltipText != "Yes") {
+            if (!binding.switchStartTime.isChecked) {
                 startTime = null
             }
-            val recurring = binding.spinnerRecurring.selectedItem.toString()
+            // TODO: Add recurring events
+//            val recurring = binding.switchRecurring.isChecked.toString()
             val location = binding.evtLocation.text.toString()
 
             var isValidEvent = true

@@ -3,6 +3,7 @@ package com.example.dayplanner.ui.list
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,17 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.dayplanner.data.Event
+import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
+import com.example.dayplanner.databinding.FragmentPlannerBinding
+import com.example.dayplanner.ui.planner.PlannerAdapter
+import com.example.dayplanner.ui.planner.PlannerItem
+import com.example.dayplanner.ui.planner.PlannerViewModel
+import java.text.DateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ListFragment : Fragment() {
@@ -24,31 +35,46 @@ class ListFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val listViewModel =
-            ViewModelProvider(this).get(ListViewModel::class.java)
+
 
         _binding = FragmentListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textList
-        listViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
+        updateRecyclerView()
 
         val fab = binding.floatingActionButton
         fab.show()
-//        TODO: Set on click listener
         fab.setOnClickListener() {
             val action = ListFragmentDirections.actionNavigationListToNavigationListAdd()
             findNavController().navigate(action)
         }
         return root
+    }
+
+    private fun updateRecyclerView() {
+        val eventRecyclerList: ArrayList<ListItem> = ArrayList()
+        val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
+
+        for(item in eventList) {
+            Log.d("my special tag", "Added an item!!")
+            eventRecyclerList.add(ListItem(item.eventName))
+        }
+
+        mRecyclerView = binding.listEvents
+        mRecyclerView.adapter = ListAdapter(eventRecyclerList, this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("my special tag", "Updating recycler view!")
+        updateRecyclerView()
     }
 
     override fun onDestroyView() {

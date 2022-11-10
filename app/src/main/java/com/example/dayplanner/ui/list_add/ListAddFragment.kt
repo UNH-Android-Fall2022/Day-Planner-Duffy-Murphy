@@ -18,7 +18,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.databinding.FragmentListAddBinding
-import com.example.dayplanner.ui.planner.PlannerItem
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -26,9 +25,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.floor
 
 
 class ListAddFragment : Fragment() {
@@ -44,10 +41,8 @@ class ListAddFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentListAddBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        // The following is adapted from https://developer.android.com/develop/ui/views/components/spinner
         val switchRecurring: SwitchMaterial = binding.switchRecurring
         switchRecurring.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
             // Responds to switch being checked/unchecked
@@ -60,7 +55,7 @@ class ListAddFragment : Fragment() {
 
         var startTime: Date? = null
         val timeTextView = binding.evtStartTime
-        // This listener is used below with the spinner
+        // This listener is used below with the switch to allow setting the time
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
         fun timePickerListener() =
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
@@ -86,8 +81,8 @@ class ListAddFragment : Fragment() {
                 timePicker.show()
                 timeTextView.visibility = View.VISIBLE
             } else {
-                timeTextView.visibility = View.GONE
                 switchStartTime.text = "No"
+                timeTextView.visibility = View.GONE
             }
         })
 

@@ -29,7 +29,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ListFragment : Fragment() {
+open class ListFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
     // This property is only valid between onCreateView and
@@ -42,13 +42,10 @@ class ListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-
         _binding = FragmentListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         updateRecyclerView()
-
         val fab = binding.floatingActionButton
         fab.show()
         fab.setOnClickListener() {
@@ -58,16 +55,19 @@ class ListFragment : Fragment() {
         return root
     }
 
-    private fun updateRecyclerView() {
-        val eventRecyclerList: ArrayList<ListItem> = ArrayList()
-        val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
-
-        for(item in eventList) {
-            eventRecyclerList.add(ListItem(item.eventName))
+    fun updateRecyclerView() {
+        mRecyclerView = binding.listEvents
+        for (i in eventList.indices) {
+            val holder = mRecyclerView.findViewHolderForAdapterPosition(i)
+//            val holder = mRecyclerView.findViewHolderForItemId(i)
+//            val holder = mRecyclerView.findViewHolderForLayoutPosition(i)
+            if (holder != null) {
+                // holder.buttonRemove.setOnClickListener { // TODO: figure out why I cannot access buttonRemove
+                // I can access holder.itemView
+            }
         }
 
-        mRecyclerView = binding.listEvents
-        mRecyclerView.adapter = ListAdapter(eventRecyclerList, this)
+        mRecyclerView.adapter = ListAdapter(this)
     }
 
     override fun onResume() {
@@ -80,3 +80,4 @@ class ListFragment : Fragment() {
         _binding = null
     }
 }
+

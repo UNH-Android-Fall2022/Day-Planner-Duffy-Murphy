@@ -52,7 +52,7 @@ class ListAddFragment : Fragment() {
                 switchRecurring.text = "No"
             }
         })
-        
+
         var startTime: Date? = null
         val timeTextView = binding.evtStartTime
         // This listener is used below with the switch to allow setting the time

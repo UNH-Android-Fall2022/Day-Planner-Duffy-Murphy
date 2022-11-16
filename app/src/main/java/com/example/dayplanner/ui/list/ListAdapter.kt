@@ -59,7 +59,7 @@ class ListAdapter (
                 }.setNegativeButton("No", null).show()
 
             if (returnVal == -1) {
-                eventList.remove(eventList[position])
+                eventList.removeAt(position)
                 notifyItemRemoved(position)
             }
         }

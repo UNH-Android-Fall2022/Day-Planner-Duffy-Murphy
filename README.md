@@ -1,6 +1,6 @@
 Day-Planner
 ===========
-The Day Planner app by Alex Murphy and Orion Duffy
+The Day Planner app by Alex Murphy and Orion Duffy.<br />
 Day Planner is a single-day planning app for planning out your day.
 
 Features:

@@ -52,7 +52,7 @@ class ListAddFragment : Fragment() {
                 switchRecurring.text = "No"
             }
         })
-
+        
         var startTime: Date? = null
         val timeTextView = binding.evtStartTime
         // This listener is used below with the switch to allow setting the time
@@ -91,7 +91,11 @@ class ListAddFragment : Fragment() {
         button.setOnClickListener() {
             val title = binding.evtTitle.text.toString()
             // duration is in units of milliseconds for compatibility with the Date library
-            val duration = binding.evtDuration.text.toString().toInt() * 60000
+            val durationString = binding.evtDuration.text.toString()
+            var duration = 0
+            if (durationString.isNotEmpty()) {
+                duration = durationString.toInt() * 60000
+            }
 
             if (!binding.switchStartTime.isChecked) {
                 startTime = null
@@ -110,7 +114,7 @@ class ListAddFragment : Fragment() {
             if (title.isEmpty()) {
                 buildAlertDialog(context,"Missing Event Title", "Please enter an event title!")
                 isValidEvent = false
-            } else if (binding.evtDuration.toString().isEmpty() || duration > 24*60*60*1000) { // Don't allow events that are longer than 24 hours
+            } else if (binding.evtDuration.text.toString().isEmpty() || duration > 24*60*60*1000) { // Don't allow events that are longer than 24 hours
                 buildAlertDialog(
                     context,
                     "Invalid Event Duration",

@@ -5,9 +5,9 @@ Day Planner is a single-day planning app for planning out your day.
 
 Features:
 ---------
--Sign-in with Firebase auth.
--Multi-fragment navigation views.
--Streamlined event creation with TimePicker.
+-Sign-in with Firebase auth.<br />
+-Multi-fragment navigation views.<br />
+-Streamlined event creation with TimePicker.<br />
 
 Features in Progress:
 ---------------------

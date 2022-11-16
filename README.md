@@ -7,7 +7,8 @@ Features:
 ---------
 -Sign-in with Firebase auth.
 -Multi-fragment navigation views.
--Streamlined event creation with TimePicker
+-Streamlined event creation with TimePicker.
 
 Features in Progress:
 ---------------------
+Option to edit or delete existing list and planner events.

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_navigation_list_to_navigation_list_add"
             app:destination="@id/navigation_list_add" />
+        <action
+            android:id="@+id/action_navigation_list_self"
+            app:destination="@id/navigation_list" />
     </fragment>
 
     <fragment

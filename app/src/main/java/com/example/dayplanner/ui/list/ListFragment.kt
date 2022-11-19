@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
@@ -35,7 +36,7 @@ open class ListFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private lateinit var mRecyclerView: RecyclerView
+    lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,21 +58,16 @@ open class ListFragment : Fragment() {
 
     fun updateRecyclerView() {
         mRecyclerView = binding.listEvents
-        for (i in eventList.indices) {
-            val holder = mRecyclerView.findViewHolderForAdapterPosition(i)
-//            val holder = mRecyclerView.findViewHolderForItemId(i)
-//            val holder = mRecyclerView.findViewHolderForLayoutPosition(i)
-            if (holder != null) {
-                // holder.buttonRemove.setOnClickListener { // TODO: figure out why I cannot access buttonRemove
-                // I can access holder.itemView
-            }
-        }
-
         mRecyclerView.adapter = ListAdapter(this)
     }
 
     override fun onResume() {
         super.onResume()
+        if (listAdapterPosition != -1) {
+            eventList.removeAt(listAdapterPosition)
+            mRecyclerView.adapter?.notifyItemRemoved(listAdapterPosition)
+            listAdapterPosition = -1 // reset the value to default
+        }
         updateRecyclerView()
     }
 
@@ -80,4 +76,3 @@ open class ListFragment : Fragment() {
         _binding = null
     }
 }
-

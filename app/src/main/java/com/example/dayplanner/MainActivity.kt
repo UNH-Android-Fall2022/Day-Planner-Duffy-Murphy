@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
 
     private val db = Firebase.firestore
 
+    companion object {
+        var listAdapterPosition: Int = -1
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

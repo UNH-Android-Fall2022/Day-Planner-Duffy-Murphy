@@ -14,7 +14,9 @@ import android.widget.ArrayAdapter
 import android.widget.CompoundButton
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.example.dayplanner.ui.list.ListFragment
 import androidx.navigation.fragment.findNavController
+import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.databinding.FragmentListAddBinding
@@ -25,10 +27,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ListAddFragment : Fragment() {
+class ListAddFragment() : Fragment() {
 
     private var _binding: FragmentListAddBinding? = null
 
@@ -165,7 +168,31 @@ class ListAddFragment : Fragment() {
                         .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
             }
         }
+
+        // Populate with default values from an event if edit is pressed
+        if (listAdapterPosition != -1) {
+            setup(listAdapterPosition)
+            // DO NOT reset the listAdapterPosition yet, as navigating back
+            // to the list fragment needs to update the recyclerView
+//            listAdapterPosition = -1 // Reset
+        }
+
         return root
+    }
+
+    private fun setup(eventListPosition: Int) {
+        val event = eventList[eventListPosition]
+        if (event != null) {
+            // The comment below is not needed because ListFragment.onResume() will take care of
+            // the deletion
+//            eventList.removeAt(listAdapterPosition)
+            if (event.startTime != null) {
+                binding.evtStartTime.text =
+                    DateFormat.getTimeInstance(DateFormat.SHORT).format(event.startTime)
+            }
+            binding.evtTitle.setText(event.eventName)
+            binding.evtDuration.setText((event.duration / 60000).toString())
+        }
     }
 
     override fun onDestroyView() {

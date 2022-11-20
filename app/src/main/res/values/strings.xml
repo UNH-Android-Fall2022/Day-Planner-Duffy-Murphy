@@ -16,6 +16,7 @@
     <string name="create">Create</string>
     <string name="list_item_button_name">Add</string>
     <string name="default_time">00:00</string>
+    <string name="sign_out">Sign Out</string>
 
     <string-array name="evt_recurring_options">
         <item>No</item>

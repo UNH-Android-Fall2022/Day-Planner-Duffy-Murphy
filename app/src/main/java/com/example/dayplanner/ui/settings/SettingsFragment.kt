@@ -7,13 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.dayplanner.MainActivity
 import com.example.dayplanner.TAG
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentSettingsBinding
+import com.example.dayplanner.getEvents
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -42,17 +45,30 @@ class SettingsFragment : Fragment() {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSettings
-        settingsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user == null) {
+            // Create and launch sign-in intent
+            val signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build()
+            signInLauncher.launch(signInIntent)
+        }  else {
+            val toolbar: Toolbar = binding.settingsToolbar
+            toolbar.title = user.displayName
+
+            binding.signoutButton.setOnClickListener {
+                AuthUI.getInstance()
+                    .signOut(root.context)
+                    .addOnCompleteListener {
+                        // ...
+                    }
+                eventList.clear()
+                root.refreshDrawableState()
+            }
         }
 
-        // Create and launch sign-in intent
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-        signInLauncher.launch(signInIntent)
 
         return root
     }
@@ -68,11 +84,22 @@ class SettingsFragment : Fragment() {
         AuthUI.IdpConfig.GoogleBuilder().build())
 
 
+
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
         if (result.resultCode == RESULT_OK) {
             // Successfully signed in
-//            val user = FirebaseAuth.getInstance().currentUser
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                Log.d(TAG, "Uploading current events to database")
+                for (event in eventList) {
+                    Firebase.firestore.collection("Users/${user.uid}/events").add(event)
+                        .addOnSuccessListener { Log.d(TAG, "Event successfully written!") }
+                        .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
+                }
+                Log.d(TAG, "Getting events from database")
+                getEvents(user.uid)
+            }
 //            Log.d(TAG, "Sign in successful. Checking if user already exists")
 //            db.collection("Users").document("${user?.uid}").get()
 //                .addOnSuccessListener { document ->

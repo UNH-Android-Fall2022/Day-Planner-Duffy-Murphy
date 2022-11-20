@@ -11,6 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.ActivityMainBinding
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.auth.ktx.auth
@@ -22,8 +23,6 @@ val TAG = "DayPlanner"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val db = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,35 +50,40 @@ class MainActivity : AppCompatActivity() {
             getEvents(user.uid)
     }
 
-    private fun getEvents(uid: String) {
-
-        Log.d(TAG, "Getting already created events from Firestore")
-        db.collection("Users/${uid}/events").get()
-            .addOnSuccessListener { documents ->
-                Log.d(TAG, "Document request succeeded")
-                val calendar: Calendar = Calendar.getInstance()
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                val currDate: Date = calendar.time
-
-                for (document in documents) {
-                    val event: Event = document.toObject(Event::class.java)
-                    //Make sure event is today and not, say, a week ago
-                    if (event.startTime == null || event.startTime?.after(currDate))
-                        eventList.add(event)
-//                    else //Delete it if it isn't today
-//                        db.collection("Users/${user}/events").document(document.id).delete()
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents: ", exception)
-            }
-    }
-
     override fun onStart() {
         super.onStart()
 
 
     }
+
+}
+//Outside of class and not private so that it can be called if a user signs in after logging in as well
+//May be changed back if I find a better method.
+fun getEvents(uid: String) {
+    val db = Firebase.firestore
+    Log.d(TAG, "Getting already created events from Firestore")
+    db.collection("Users/${uid}/events").get()
+        .addOnSuccessListener { documents ->
+            Log.d(TAG, "Document request succeeded")
+            val calendar: Calendar = Calendar.getInstance()
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            val currDate: Date = calendar.time
+
+            for (document in documents) {
+                val event: Event = document.toObject(Event::class.java)
+                //Make sure event is today and not, say, a week ago
+                if (event.startTime == null || event.startTime?.after(currDate)) {
+                    //Needed for signin, because it uploads all current events before getting from db
+                    if (!eventList.contains(event))
+                        eventList.add(event)
+                }
+//                    else //Delete it if it isn't today
+//                        db.collection("Users/${user}/events").document(document.id).delete()
+            }
+        }
+        .addOnFailureListener { exception ->
+            Log.w(TAG, "Error getting documents: ", exception)
+        }
 }

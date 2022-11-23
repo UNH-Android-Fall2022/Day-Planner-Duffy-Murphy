@@ -34,6 +34,12 @@ class PlannerFragment : Fragment() {
         _binding = FragmentPlannerBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        updateRecyclerView()
+
+        return root
+    }
+
+    private fun updateRecyclerView() {
         val eventRecyclerList: ArrayList<PlannerItem> = ArrayList()
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
 
@@ -71,8 +77,11 @@ class PlannerFragment : Fragment() {
 
         mRecyclerView = binding.plannerEvents
         mRecyclerView.adapter = PlannerAdapter(eventRecyclerList, this)
+    }
 
-        return root
+    override fun onResume() {
+        super.onResume()
+        updateRecyclerView()
     }
 
     override fun onDestroyView() {

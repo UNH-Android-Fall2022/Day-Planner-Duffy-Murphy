@@ -25,7 +25,11 @@
         android:id="@+id/navigation_settings"
         android:name="com.example.dayplanner.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_navigation_settings_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_list_add"
@@ -35,5 +39,14 @@
         <action
             android:id="@+id/action_navigation_list_add_to_navigation_list"
             app:destination="@id/navigation_list" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.dayplanner.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_navigation_settings"
+            app:destination="@id/navigation_settings" />
     </fragment>
 </navigation>

@@ -19,6 +19,7 @@ import java.util.*
 
 
 val TAG = "DayPlanner"
+var dbPullCompleted: Boolean = false
 
 class MainActivity : AppCompatActivity() {
 
@@ -81,6 +82,7 @@ fun getEvents(uid: String) {
                 }
 //                    else //Delete it if it isn't today
 //                        db.collection("Users/${user}/events").document(document.id).delete()
+                dbPullCompleted = true
             }
         }
         .addOnFailureListener { exception ->

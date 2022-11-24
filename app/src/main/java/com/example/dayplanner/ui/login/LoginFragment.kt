@@ -1,22 +1,31 @@
 package com.example.dayplanner.ui.login
 
+import android.app.ActionBar
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentLoginBinding
+import com.example.dayplanner.dbPullCompleted
 import com.example.dayplanner.getEvents
 import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -26,11 +35,6 @@ import com.google.firebase.ktx.Firebase
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
 
@@ -45,21 +49,15 @@ class LoginFragment : Fragment() {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val user = FirebaseAuth.getInstance().currentUser
+        //val user = FirebaseAuth.getInstance().currentUser
 
-        if (user != null)
-        {
-            val action = LoginFragmentDirections.actionLoginFragmentToNavigationSettings()
-            findNavController().navigate(action)
-        } else {
-            binding.loginBttn.setOnClickListener {
-                // Create and launch sign-in intent
-                val signInIntent = AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .build()
-                signInLauncher.launch(signInIntent)
-            }
+        binding.loginBttn.setOnClickListener {
+            // Create and launch sign-in intent
+            val signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build()
+            signInLauncher.launch(signInIntent)
         }
 
         return root
@@ -89,6 +87,7 @@ class LoginFragment : Fragment() {
                 }
                 Log.d(TAG, "Getting events from database")
                 getEvents(user.uid)
+                dbPullCompleted = true
             }
 //            Log.d(TAG, "Sign in successful. Checking if user already exists")
 //            db.collection("Users").document("${user?.uid}").get()
@@ -99,7 +98,7 @@ class LoginFragment : Fragment() {
 //                    Log.d(TAG, "User probably does not exist, adding user")
 //                    db.collection("Users").document("${user?.uid}").set(User())
 //                }
-            val action = LoginFragmentDirections.actionLoginFragmentToNavigationSettings()
+            val action = LoginFragmentDirections.actionNavigationLoginToNavigationSettings()
             findNavController().navigate(action)
         } else {
             // Sign in failed. If response is null the user canceled the

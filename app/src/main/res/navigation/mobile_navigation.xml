@@ -27,8 +27,8 @@
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" >
         <action
-            android:id="@+id/action_navigation_settings_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/action_navigation_settings_to_navigation_login"
+            app:destination="@id/navigation_login" />
     </fragment>
 
     <fragment
@@ -41,12 +41,12 @@
             app:destination="@id/navigation_list" />
     </fragment>
     <fragment
-        android:id="@+id/loginFragment"
+        android:id="@+id/navigation_login"
         android:name="com.example.dayplanner.ui.login.LoginFragment"
-        android:label="fragment_login"
+        android:label="Login or Register"
         tools:layout="@layout/fragment_login" >
         <action
-            android:id="@+id/action_loginFragment_to_navigation_settings"
+            android:id="@+id/action_navigation_login_to_navigation_settings"
             app:destination="@id/navigation_settings" />
     </fragment>
 </navigation>

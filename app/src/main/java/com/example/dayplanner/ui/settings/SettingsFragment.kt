@@ -17,6 +17,7 @@ import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentSettingsBinding
+import com.example.dayplanner.dbPullCompleted
 import com.example.dayplanner.getEvents
 import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.firebase.ui.auth.AuthUI
@@ -41,16 +42,13 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val settingsViewModel =
-            ViewModelProvider(this).get(SettingsViewModel::class.java)
-
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val user = FirebaseAuth.getInstance().currentUser
 
         if (user == null) {
-            val action = SettingsFragmentDirections.actionNavigationSettingsToLoginFragment()
+            val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
             findNavController().navigate(action)
         }  else {
             val toolbar: Toolbar = binding.settingsToolbar
@@ -63,16 +61,15 @@ class SettingsFragment : Fragment() {
                         Log.d(TAG, "Successfully signed out")
                     }
                 eventList.clear()
-                val action = SettingsFragmentDirections.actionNavigationSettingsToLoginFragment()
+                dbPullCompleted = false
+
+                val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
                 findNavController().navigate(action)
             }
         }
 
-
         return root
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -12,9 +12,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentPlannerBinding
+import com.example.dayplanner.dbPullCompleted
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.concurrent.thread
 
 class PlannerFragment : Fragment() {
 
@@ -34,12 +41,19 @@ class PlannerFragment : Fragment() {
         _binding = FragmentPlannerBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+
         updateRecyclerView()
 
         return root
     }
 
     private fun updateRecyclerView() {
+
+//        if (FirebaseAuth.getInstance().currentUser != null) {
+//            while (!dbPullCompleted)
+//                delay(100)
+//        }
+
         val eventRecyclerList: ArrayList<PlannerItem> = ArrayList()
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
 

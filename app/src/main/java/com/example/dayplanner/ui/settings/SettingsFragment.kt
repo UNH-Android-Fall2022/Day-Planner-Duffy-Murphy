@@ -11,14 +11,11 @@ import android.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.dayplanner.MainActivity
-import com.example.dayplanner.TAG
+import com.example.dayplanner.*
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentSettingsBinding
-import com.example.dayplanner.dbPullCompleted
-import com.example.dayplanner.getEvents
 import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -61,7 +58,7 @@ class SettingsFragment : Fragment() {
                         Log.d(TAG, "Successfully signed out")
                     }
                 eventList.clear()
-                dbPullCompleted = false
+                DB_PULL_COMPLETED = false
 
                 val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
                 findNavController().navigate(action)

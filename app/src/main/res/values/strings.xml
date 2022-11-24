@@ -19,6 +19,8 @@
     <string name="sign_out">Sign Out</string>
     <string name="login">You are not currently logged in!</string>
     <string name="signin">Sign in or\n Sign up</string>
+    <string name="channel_name">Day Planner</string>
+    <string name="channel_description">The notification channel for the Day Planner app</string>
 
     <string-array name="evt_recurring_options">
         <item>No</item>

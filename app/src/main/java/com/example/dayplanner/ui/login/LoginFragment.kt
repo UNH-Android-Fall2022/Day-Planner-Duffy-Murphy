@@ -15,12 +15,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.dayplanner.R
-import com.example.dayplanner.TAG
+import com.example.dayplanner.*
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentLoginBinding
-import com.example.dayplanner.dbPullCompleted
-import com.example.dayplanner.getEvents
 import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -87,7 +84,7 @@ class LoginFragment : Fragment() {
                 }
                 Log.d(TAG, "Getting events from database")
                 getEvents(user.uid)
-                dbPullCompleted = true
+                DB_PULL_COMPLETED = true
             }
 //            Log.d(TAG, "Sign in successful. Checking if user already exists")
 //            db.collection("Users").document("${user?.uid}").get()

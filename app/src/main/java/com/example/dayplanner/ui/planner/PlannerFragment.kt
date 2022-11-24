@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentPlannerBinding
-import com.example.dayplanner.dbPullCompleted
+import com.example.dayplanner.DB_PULL_COMPLETED
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -41,6 +41,12 @@ class PlannerFragment : Fragment() {
         _binding = FragmentPlannerBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+//        Possibly set a timer to run a bit later if the db pull is not completed
+//        if (DB_PULL_COMPLETED || FirebaseAuth.getInstance().currentUser == null) {
+//            updateRecyclerView()
+//        } else {
+//
+//        }
 
         updateRecyclerView()
 

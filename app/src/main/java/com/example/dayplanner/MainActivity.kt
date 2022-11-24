@@ -1,5 +1,10 @@
 package com.example.dayplanner
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,11 +24,14 @@ import java.util.*
 
 
 val TAG = "DayPlanner"
-var dbPullCompleted: Boolean = false
+var DB_PULL_COMPLETED: Boolean = false
+var CHANNEL_ID: String = "Day Planner App Notification Channel"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var channel: NotificationChannel
+    private lateinit var notificationManager: NotificationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +40,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
-
-
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         // Passing each menu ID as a set of Ids because each
@@ -46,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        createNotificationChannel()
+        notificationManager.cancelAll()
+
         val user = Firebase.auth.currentUser
         if (user != null)
             getEvents(user.uid)
@@ -56,6 +65,24 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
 
 }
 //Outside of class and not private so that it can be called if a user signs in after logging in as well
@@ -82,7 +109,7 @@ fun getEvents(uid: String) {
                 }
 //                    else //Delete it if it isn't today
 //                        db.collection("Users/${user}/events").document(document.id).delete()
-                dbPullCompleted = true
+                DB_PULL_COMPLETED = true
             }
         }
         .addOnFailureListener { exception ->

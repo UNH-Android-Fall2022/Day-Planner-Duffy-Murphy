@@ -33,6 +33,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var channel: NotificationChannel
     private lateinit var notificationManager: NotificationManager
 
+    companion object {
+        var listAdapterPosition: Int = -1
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

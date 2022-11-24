@@ -11,16 +11,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.CompoundButton
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.example.dayplanner.ui.list.ListFragment
 import androidx.navigation.fragment.findNavController
+import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.databinding.FragmentListAddBinding
-import com.example.dayplanner.ui.planner.PlannerItem
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -29,7 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ListAddFragment : Fragment() {
+class ListAddFragment() : Fragment() {
 
     private var _binding: FragmentListAddBinding? = null
 
@@ -42,59 +44,24 @@ class ListAddFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentListAddBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        // The following is adapted from https://developer.android.com/develop/ui/views/components/spinner
-        val spinnerRecurring: Spinner = binding.spinnerRecurring
-        context?.let {
-            ArrayAdapter.createFromResource(
-                it,
-                R.array.evt_recurring_options,
-                android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                //
-                // Specify the layout to use when the list of choices appears
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                // Apply the adapter to the spinner
-                spinnerRecurring.adapter = adapter
+        val switchRecurring: SwitchMaterial = binding.switchRecurring
+        switchRecurring.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                switchRecurring.text = "Yes"
+            } else {
+                switchRecurring.text = "No"
             }
-        }
-        spinnerRecurring.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                spinnerRecurring.setSelection(pos)
-                spinnerRecurring.tooltipText = parent.getItemAtPosition(pos).toString()
-            }
+        })
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                spinnerRecurring.setSelection(0)
-                spinnerRecurring.tooltipText = parent.getItemAtPosition(0).toString()
-            }
-        }
-
-
-        val spinnerStartTime: Spinner = binding.spinnerStartTime
-        context?.let {
-            ArrayAdapter.createFromResource(
-                it,
-                R.array.evt_recurring_options,
-                android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                //
-                // Specify the layout to use when the list of choices appears
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                // Apply the adapter to the spinner
-                spinnerStartTime.adapter = adapter
-            }
-        }
-
-        var startTime: Date? = Date()
+        var startTime: Date? = null
         val timeTextView = binding.evtStartTime
-        // This listener is used below with the spinner
+        // This listener is used below with the switch to allow setting the time
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
         fun timePickerListener() =
             TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-
                 val calendar: Calendar = Calendar.getInstance()
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
@@ -104,52 +71,94 @@ class ListAddFragment : Fragment() {
                 timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime)
             }
 
-        spinnerStartTime.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                spinnerStartTime.setSelection(pos)
-                spinnerStartTime.tooltipText = parent.getItemAtPosition(pos).toString()
-                if (spinnerStartTime.tooltipText == "Yes") {
-                    val timePicker: TimePickerDialog = TimePickerDialog (context,
-                        timePickerListener(),
-                        Calendar.HOUR_OF_DAY,
-                        Calendar.MINUTE,
-                        false)
-                    timePicker.show()
-                    timeTextView.visibility = View.VISIBLE
-                } else {
-                    timeTextView.visibility = View.GONE
-                }
+        val switchStartTime: SwitchMaterial = binding.switchStartTime
+        switchStartTime.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                switchStartTime.text = "Yes"
+                val timePicker: TimePickerDialog = TimePickerDialog (context,
+                    timePickerListener(),
+                    Calendar.HOUR_OF_DAY,
+                    Calendar.MINUTE,
+                    false)
+                timePicker.show()
+                timeTextView.visibility = View.VISIBLE
+            } else {
+                switchStartTime.text = "No"
+                timeTextView.visibility = View.GONE
             }
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                spinnerStartTime.setSelection(0)
-                spinnerStartTime.tooltipText = parent.getItemAtPosition(0).toString()
-            }
-        }
+        })
+
 
         val button = binding.listAddSubmit
         button.setOnClickListener() {
             val title = binding.evtTitle.text.toString()
-            val duration = binding.evtDuration.text.toString()
+            // duration is in units of milliseconds for compatibility with the Date library
+            val durationString = binding.evtDuration.text.toString()
+            var duration = 0
+            if (durationString.isNotEmpty()) {
+                duration = durationString.toInt() * 60000
+            }
 
-            if (binding.spinnerStartTime.tooltipText != "Yes") {
+            if (!binding.switchStartTime.isChecked) {
                 startTime = null
             }
-            val recurring = binding.spinnerRecurring.selectedItem.toString()
+            // TODO: Add recurring events
+//            val recurring = binding.switchRecurring.isChecked.toString()
             val location = binding.evtLocation.text.toString()
 
+            var isValidEvent = true
 
+            // Validate events:
+            // Check for empty title
+            // Check for empty event duration, note that the user can only enter numbers.
+            // Check if event duration is longer than 24 hours (this is not the app for scheduling such an event)
+            // Check if the event overlaps with a pre-existing event.
             if (title.isEmpty()) {
                 buildAlertDialog(context,"Missing Event Title", "Please enter an event title!")
-            } else if (duration.isEmpty() || duration.toInt() > 24*60) {
+                isValidEvent = false
+            } else if (binding.evtDuration.text.toString().isEmpty() || duration > 24*60*60*1000) { // Don't allow events that are longer than 24 hours
                 buildAlertDialog(
                     context,
                     "Invalid Event Duration",
                     "Please enter an event duration that is longer than 0 minutes and shorter than 24 hours!"
                 )
-            } else {
+                isValidEvent = false
+            } else if (startTime != null) {
+                // Validate event times
+                for (event in eventList) {
+                    if (event.startTime != null) {
+                        val eventStart = event.startTime.time
+                        val eventEnd = event.startTime.time + event.duration
+                        val currentStart = startTime!!.time
+                        val currentEnd = startTime!!.time + duration
+                        // I made sure that startTime is not null but I was still forced to add the "!!"
+                        // I do not trust the range check that the compiler suggests
+                        if (eventStart < currentStart && eventEnd > currentStart) {
+                            // This event has a start time that is contained within the duration of a pre-existing event
+                            val startDelay: Int = ((eventEnd - currentStart) / 60000).toInt() + 1
+                            buildAlertDialog(context,"Time Conflict",
+                                "There is a time conflict with this event and other event(s)! " +
+                                        "This event would need to start " + startDelay.toString() + " minutes later.")
+                            isValidEvent = false
+                            break
+                        } else if (eventStart < currentEnd && eventEnd > currentEnd) {
+                            // This event has an end time that is contained within the duration of a pre-existing event
+                            val speedUp: Int = ((currentEnd - eventStart) / 60000).toInt() + 1
+                            buildAlertDialog(context,"Time Conflict",
+                                "There is a time conflict with this event and other event(s)! " +
+                                        "This event would need to end " + speedUp.toString() + " minutes sooner.")
+                            isValidEvent = false
+                            break
+                        }
+                    }
+                }
+            }
+
+            if (isValidEvent) {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
-                val event: Event = Event(startTime, duration.toInt() * 60000, title) // title is already title.toString()
+                val event: Event = Event(startTime, duration, title) // title is already title.toString()
                 eventList.add(event)
 
                 val user = Firebase.auth.currentUser
@@ -159,7 +168,31 @@ class ListAddFragment : Fragment() {
                         .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
             }
         }
+
+        // Populate with default values from an event if edit is pressed
+        if (listAdapterPosition != -1) {
+            setup(listAdapterPosition)
+            // DO NOT reset the listAdapterPosition yet, as navigating back
+            // to the list fragment needs to update the recyclerView
+//            listAdapterPosition = -1 // Reset
+        }
+
         return root
+    }
+
+    private fun setup(eventListPosition: Int) {
+        val event = eventList[eventListPosition]
+        if (event != null) {
+            // The comment below is not needed because ListFragment.onResume() will take care of
+            // the deletion
+//            eventList.removeAt(listAdapterPosition)
+            if (event.startTime != null) {
+                binding.evtStartTime.text =
+                    DateFormat.getTimeInstance(DateFormat.SHORT).format(event.startTime)
+            }
+            binding.evtTitle.setText(event.eventName)
+            binding.evtDuration.setText((event.duration / 60000).toString())
+        }
     }
 
     override fun onDestroyView() {

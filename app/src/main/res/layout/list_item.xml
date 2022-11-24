@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="event 1"
-            android:paddingLeft="25dp"
+            android:paddingLeft="30dp"
             android:layout_marginTop="10dp"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -24,15 +24,27 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"/>
 
-<!--        <Button-->
-<!--            android:id="@+id/list_add_submit"-->
-<!--            android:layout_width="@dimen/button_width"-->
-<!--            android:layout_height="@dimen/button_height"-->
-<!--            android:layout_marginTop="0dp"-->
-<!--            android:layout_marginEnd="25dp"-->
-<!--            android:text="@string/list_item_button_name"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+        <Button
+            android:id="@+id/list_edit"
+            android:visibility="gone"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginEnd="5dp"
+            android:text="Edit"
+            android:textSize="15dp"
+            app:layout_constraintEnd_toStartOf="@id/list_remove"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/list_remove"
+            android:visibility="gone"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginEnd="5dp"
+            android:text="Remove"
+            android:textSize="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

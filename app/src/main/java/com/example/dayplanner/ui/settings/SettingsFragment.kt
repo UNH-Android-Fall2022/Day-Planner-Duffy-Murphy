@@ -7,13 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.dayplanner.TAG
+import androidx.navigation.fragment.findNavController
+import com.example.dayplanner.*
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentSettingsBinding
+import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -36,59 +39,34 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val settingsViewModel =
-            ViewModelProvider(this).get(SettingsViewModel::class.java)
-
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSettings
-        settingsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
+        val user = FirebaseAuth.getInstance().currentUser
 
-        // Create and launch sign-in intent
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-        signInLauncher.launch(signInIntent)
+        if (user == null) {
+            val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
+            findNavController().navigate(action)
+        }  else {
+            val toolbar: Toolbar = binding.settingsToolbar
+            toolbar.title = user.displayName
+
+            binding.signoutButton.setOnClickListener {
+                AuthUI.getInstance()
+                    .signOut(root.context)
+                    .addOnCompleteListener {
+                        Log.d(TAG, "Successfully signed out")
+                    }
+                eventList.clear()
+                DB_PULL_COMPLETED = false
+
+                val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
+                findNavController().navigate(action)
+            }
+        }
 
         return root
     }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ){ res ->
-        this.onSignInResult(res)
-    }
-
-    val providers = arrayListOf(
-        //AuthUI.IdpConfig.EmailBuilder().build(),
-        AuthUI.IdpConfig.GoogleBuilder().build())
-
-
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            // Successfully signed in
-//            val user = FirebaseAuth.getInstance().currentUser
-//            Log.d(TAG, "Sign in successful. Checking if user already exists")
-//            db.collection("Users").document("${user?.uid}").get()
-//                .addOnSuccessListener { document ->
-//                    Log.d(TAG, "User exists. No modifications necessary")
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.d(TAG, "User probably does not exist, adding user")
-//                    db.collection("Users").document("${user?.uid}").set(User())
-//                }
-        } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
-    }
-}
 
     override fun onDestroyView() {
         super.onDestroyView()

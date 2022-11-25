@@ -1,31 +1,27 @@
 package com.example.dayplanner
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.dayplanner.data.Event
-import com.example.dayplanner.data.eventList
+import com.example.dayplanner.data.User
 import com.example.dayplanner.databinding.ActivityMainBinding
-import com.firebase.ui.auth.AuthUI
+import com.example.dayplanner.background.UserData.Companion.startup
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.auth.ktx.auth
-import java.util.*
 
 
 val TAG = "DayPlanner"
 var DB_PULL_COMPLETED: Boolean = false
 var CHANNEL_ID: String = "Day Planner App Notification Channel"
+var userData: User? = null
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,8 +55,9 @@ class MainActivity : AppCompatActivity() {
         notificationManager.cancelAll()
 
         val user = Firebase.auth.currentUser
-        if (user != null)
-            getEvents(user.uid)
+        if (user != null) {
+            startup(user.uid)
+        }
     }
 
     override fun onStart() {
@@ -86,36 +83,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-}
-//Outside of class and not private so that it can be called if a user signs in after logging in as well
-//May be changed back if I find a better method.
-fun getEvents(uid: String) {
-    val db = Firebase.firestore
-    Log.d(TAG, "Getting already created events from Firestore")
-    db.collection("Users/${uid}/events").get()
-        .addOnSuccessListener { documents ->
-            Log.d(TAG, "Document request succeeded")
-            val calendar: Calendar = Calendar.getInstance()
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            val currDate: Date = calendar.time
-
-            for (document in documents) {
-                val event: Event = document.toObject(Event::class.java)
-                //Make sure event is today and not, say, a week ago
-                if (event.startTime == null || event.startTime?.after(currDate)) {
-                    //Needed for signin, because it uploads all current events before getting from db
-                    if (!eventList.contains(event))
-                        eventList.add(event)
-                }
-//                    else //Delete it if it isn't today
-//                        db.collection("Users/${user}/events").document(document.id).delete()
-                DB_PULL_COMPLETED = true
-            }
-        }
-        .addOnFailureListener { exception ->
-            Log.w(TAG, "Error getting documents: ", exception)
-        }
 }

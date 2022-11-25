@@ -1,29 +1,20 @@
 package com.example.dayplanner.ui.settings
 
-import android.app.Activity.RESULT_OK
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
-import com.example.dayplanner.data.Event
-import com.example.dayplanner.data.User
-import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentSettingsBinding
-import com.example.dayplanner.ui.list.ListFragmentDirections
+import com.example.dayplanner.background.UserData.Companion.logout
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.util.*
 
 class SettingsFragment : Fragment() {
 
@@ -57,8 +48,7 @@ class SettingsFragment : Fragment() {
                     .addOnCompleteListener {
                         Log.d(TAG, "Successfully signed out")
                     }
-                eventList.clear()
-                DB_PULL_COMPLETED = false
+                logout()
 
                 val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
                 findNavController().navigate(action)

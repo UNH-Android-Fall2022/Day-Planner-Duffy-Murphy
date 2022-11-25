@@ -30,9 +30,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var notificationManager: NotificationManager
 
     companion object {
+        lateinit var context: Context
         var listAdapterPosition: Int = -1
     }
     override fun onCreate(savedInstanceState: Bundle?) {
+        context = this
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -58,12 +60,6 @@ class MainActivity : AppCompatActivity() {
         if (user != null) {
             startup(user.uid)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-
     }
 
     private fun createNotificationChannel() {

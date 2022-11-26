@@ -1,25 +1,28 @@
 package com.example.dayplanner.ui.settings
 
-import android.app.Activity.RESULT_OK
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.CompoundButton
+import android.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.example.dayplanner.TAG
-import com.example.dayplanner.data.Event
-import com.example.dayplanner.data.User
-import com.example.dayplanner.data.eventList
+import androidx.navigation.fragment.findNavController
+import com.example.dayplanner.*
 import com.example.dayplanner.databinding.FragmentSettingsBinding
+import com.example.dayplanner.background.UserData.Companion.logout
+import com.example.dayplanner.background.UserData.Companion.resetAlarms
+import com.example.dayplanner.data.User
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
+import java.lang.Thread.sleep
 import java.util.*
 
 class SettingsFragment : Fragment() {
@@ -36,59 +39,75 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val settingsViewModel =
-            ViewModelProvider(this).get(SettingsViewModel::class.java)
-
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSettings
-        settingsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user == null) {
+            val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
+            findNavController().navigate(action)
+        }  else {
+
+            val toolbar: Toolbar = binding.settingsToolbar
+            toolbar.title = user.displayName
+
+            binding.signoutButton.setOnClickListener {
+                AuthUI.getInstance()
+                    .signOut(root.context)
+                    .addOnCompleteListener {
+                        Log.d(TAG, "Successfully signed out")
+                    }
+                logout()
+
+                val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
+                findNavController().navigate(action)
+            }
         }
 
-        // Create and launch sign-in intent
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-        signInLauncher.launch(signInIntent)
+
+        val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
+        val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
+
+
+        if (userData?.startNotifications != null && userData!!.startNotifications) {
+            startNotifSwitch.isChecked = true
+            startNotifSwitch.text = getString(R.string.yes)
+        }
+        if (userData?.endNotifications != null && userData!!.endNotifications) {
+            endNotifSwitch.isChecked = true
+            endNotifSwitch.text = getString(R.string.yes)
+        }
+
+        startNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                startNotifSwitch.text = getString(R.string.yes)
+                //Log.d(TAG, "User data: ${userData}")
+                userData?.startNotifications = true
+            } else {
+                startNotifSwitch.text = getString(R.string.no)
+                userData?.startNotifications = false
+            }
+            userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
+            resetAlarms()
+        })
+
+        endNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                endNotifSwitch.text = getString(R.string.yes)
+                userData?.endNotifications = true
+            } else {
+                endNotifSwitch.text = getString(R.string.no)
+                userData?.endNotifications = false
+            }
+            userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
+            resetAlarms()
+        })
 
         return root
     }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ){ res ->
-        this.onSignInResult(res)
-    }
-
-    val providers = arrayListOf(
-        //AuthUI.IdpConfig.EmailBuilder().build(),
-        AuthUI.IdpConfig.GoogleBuilder().build())
-
-
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            // Successfully signed in
-//            val user = FirebaseAuth.getInstance().currentUser
-//            Log.d(TAG, "Sign in successful. Checking if user already exists")
-//            db.collection("Users").document("${user?.uid}").get()
-//                .addOnSuccessListener { document ->
-//                    Log.d(TAG, "User exists. No modifications necessary")
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.d(TAG, "User probably does not exist, adding user")
-//                    db.collection("Users").document("${user?.uid}").set(User())
-//                }
-        } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
-    }
-}
 
     override fun onDestroyView() {
         super.onDestroyView()

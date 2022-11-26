@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
+import com.example.dayplanner.background.UserData
 import com.example.dayplanner.databinding.FragmentListAddBinding
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
@@ -162,10 +163,12 @@ class ListAddFragment() : Fragment() {
                 eventList.add(event)
 
                 val user = Firebase.auth.currentUser
-                if (user != null)
+                if (user != null) {
                     Firebase.firestore.collection("Users/${user.uid}/events").add(event)
                         .addOnSuccessListener { Log.d(TAG, "Event successfully written!") }
                         .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
+                    UserData.setAlarm(event)
+                }
             }
         }
 

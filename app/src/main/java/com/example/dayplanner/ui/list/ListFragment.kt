@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
+import com.example.dayplanner.background.UserData
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
@@ -25,6 +26,9 @@ import com.example.dayplanner.databinding.FragmentPlannerBinding
 import com.example.dayplanner.ui.planner.PlannerAdapter
 import com.example.dayplanner.ui.planner.PlannerItem
 import com.example.dayplanner.ui.planner.PlannerViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -64,6 +68,24 @@ open class ListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (listAdapterPosition != -1) {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                val db = Firebase.firestore
+                val event = eventList.get(listAdapterPosition)
+                db.collection("Users/${uid}/events")
+                    .whereEqualTo("eventName", event.eventName)
+                    .whereEqualTo("startTime", event.startTime)
+                    .whereEqualTo("duration", event.duration)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        for (document in documents) {
+                            db.collection("Users/${uid}/events")
+                                .document(document.id)
+                                .delete()
+                        }
+                    }
+                UserData.clearEventAlarms(event)
+            }
             eventList.removeAt(listAdapterPosition)
             mRecyclerView.adapter?.notifyItemRemoved(listAdapterPosition)
             listAdapterPosition = -1 // reset the value to default

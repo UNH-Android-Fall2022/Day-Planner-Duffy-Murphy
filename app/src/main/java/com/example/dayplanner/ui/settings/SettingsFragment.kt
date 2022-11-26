@@ -62,6 +62,17 @@ class SettingsFragment : Fragment() {
             }
 
             val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
+            val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
+
+            if (userData!!.startNotifications) {
+                startNotifSwitch.isChecked = true
+                startNotifSwitch.text = getString(R.string.yes)
+            }
+            if (userData!!.endNotifications) {
+                endNotifSwitch.isChecked = true
+                endNotifSwitch.text = getString(R.string.yes)
+            }
+
             startNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
                 // Responds to switch being checked/unchecked
                 if (isChecked) {
@@ -84,7 +95,6 @@ class SettingsFragment : Fragment() {
                 resetAlarms()
             })
 
-            val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
             endNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
                 // Responds to switch being checked/unchecked
                 if (isChecked) {

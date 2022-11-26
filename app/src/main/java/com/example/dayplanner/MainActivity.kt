@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -16,6 +17,8 @@ import com.example.dayplanner.databinding.ActivityMainBinding
 import com.example.dayplanner.background.UserData.Companion.startup
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
+import java.text.DateFormat
+import java.util.*
 
 
 val TAG = "DayPlanner"
@@ -56,6 +59,9 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel()
         notificationManager.cancelAll()
 
+        val timeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
+        Log.d(TAG, "Current time and day: ${timeFormat.format(Date())}")
+
         val user = Firebase.auth.currentUser
         if (user != null) {
             startup(user.uid)
@@ -78,5 +84,4 @@ class MainActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(channel)
         }
     }
-
 }

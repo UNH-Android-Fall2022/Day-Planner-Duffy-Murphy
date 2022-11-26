@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random.Default.nextInt
@@ -27,6 +28,7 @@ class UserData {
     //https://proandroiddev.com/everything-you-need-to-know-about-adding-notifications-with-alarm-manager-in-android-cb94a92b3235
     private class NotificationAlarm: BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
+            Log.d(TAG, "NotificationAlarm onReceive function was called")
             val eventName: String? = p1?.extras?.getString("name")
             val _eventStart: Boolean? = p1?.extras?.getBoolean("eventStart")
             val _id: Int? = p1?.extras?.getInt("id")
@@ -66,6 +68,7 @@ class UserData {
             builder?.let {
                 p0?.let { with(NotificationManagerCompat.from(it)) {
                     notify(id, builder.build())
+                    Log.d(TAG, "notification sent")
                 } }
             }
 
@@ -115,8 +118,12 @@ class UserData {
             db.collection("Users").document(uid).get()
                 .addOnSuccessListener { user ->
                     Log.d(TAG, "User data pulled")
-                    userData = user.toObject(User::class.java)
-                    Log.d(TAG, "User data: ${userData}")
+                    if (user.exists()) {
+                        userData = user.toObject(User::class.java)
+                        Log.d(TAG, "User data: ${userData}")
+                    } else {
+                        userData = User()
+                    }
                     //Needs to be called in order so this function can work
                     setAllAlarms()
                 }
@@ -128,42 +135,66 @@ class UserData {
         //Must include old event to update event! Otherwise, this function has no way of knowing for sure it's the same event
         fun setAlarm(event: Event, oldEvent: Event? = null) {
             if (event.startTime != null && userData != null) {
-
                 if (oldEvent == null) {
-                    if (userData!!.startNotifications)
-                    {
+                    if (userData!!.startNotifications) {
                         val eventTime = event.startTime.time
-                        val id = nextInt(0, Int.MAX_VALUE - 1)
+                        if (Date(eventTime).after(Date())) {
+                            val id = nextInt(0, Int.MAX_VALUE - 1)
 
-                        val alarmIntent = Intent(context, NotificationAlarm::class.java)
-                        alarmIntent.putExtra("id", id)
-                        alarmIntent.putExtra("eventName", event.eventName)
-                        alarmIntent.putExtra("eventStart", true)
-                        alarmIntent.putExtra("startTime", eventTime)
+                            val alarmIntent = Intent(context, NotificationAlarm::class.java)
+                            alarmIntent.putExtra("id", id)
+                            alarmIntent.putExtra("eventName", event.eventName)
+                            alarmIntent.putExtra("eventStart", true)
+                            alarmIntent.putExtra("startTime", eventTime)
 
-                        val pendingIntent = PendingIntent.getBroadcast(context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+                            val pendingIntent = PendingIntent.getBroadcast(
+                                context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
 
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, eventTime, pendingIntent)
-                        alarmList.add(alarmIntent)
+                            alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.RTC_WAKEUP, eventTime, pendingIntent)
+                            alarmList.add(alarmIntent)
+
+                            val timeFormat =
+                                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
+                            Log.d(
+                                TAG,
+                                "Alarm with id ${id.toString()} and startTime ${
+                                    timeFormat.format(Date(eventTime))
+                                } created for ${event.eventName}"
+                            )
+                        }
                     }
-                    if (userData!!.endNotifications)
-                    {
+                    if (userData!!.endNotifications) {
                         val eventTime = event.startTime.time + event.duration
-                        val id = nextInt(0, Int.MAX_VALUE - 1)
+                        if (Date(eventTime).after(Date())) {
+                            val id = nextInt(0, Int.MAX_VALUE - 1)
 
-                        val alarmIntent = Intent(context, NotificationAlarm::class.java)
-                        alarmIntent.putExtra("id", id)
-                        alarmIntent.putExtra("eventName", event.eventName)
-                        alarmIntent.putExtra("eventStart", false)
-                        alarmIntent.putExtra("startTime", eventTime)
+                            val alarmIntent = Intent(context, NotificationAlarm::class.java)
+                            alarmIntent.putExtra("id", id)
+                            alarmIntent.putExtra("eventName", event.eventName)
+                            alarmIntent.putExtra("eventStart", false)
+                            alarmIntent.putExtra("startTime", eventTime)
 
-                        val pendingIntent = PendingIntent.getBroadcast(context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+                            val pendingIntent = PendingIntent.getBroadcast(
+                                context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
 
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, eventTime, pendingIntent)
-                        alarmList.add(alarmIntent)
+                            alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.RTC_WAKEUP, eventTime, pendingIntent)
+                            alarmList.add(alarmIntent)
+
+                            val timeFormat =
+                                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
+                            Log.d(
+                                TAG,
+                                "Alarm with id ${id.toString()} and startTime ${
+                                    timeFormat.format(Date(eventTime))
+                                } created for ${event.eventName}"
+                            )
+                        }
                     }
                 } else {
-                    clearAlarm(oldEvent)
+                    Log.d(TAG, "Clearing alarms for ${oldEvent.eventName}")
+                    clearEventAlarms(oldEvent)
                     setAlarm(event)
                 }
 
@@ -174,7 +205,8 @@ class UserData {
             }
         }
 
-        fun clearAlarm(event: Event) {
+        //Clears all alarms for 1 event
+        fun clearEventAlarms(event: Event) {
             if (event.startTime != null) {
                 for (intent in alarmList) {
                     val eventStart = event.startTime.time
@@ -196,6 +228,7 @@ class UserData {
             }
         }
 
+        //clears either the start or end alarm of an event
         private fun clearOneAlarm(event: Event, startAlarm: Boolean)
         {
             if (event.startTime != null) {
@@ -214,6 +247,7 @@ class UserData {
         }
 
         private fun setAllAlarms() {
+            Log.d(TAG, "Setting all alarms")
             for (event in eventList)
             {
                 if (event.startTime != null)
@@ -222,10 +256,16 @@ class UserData {
         }
 
         private fun clearAllAlarms() {
-            for (event in eventList) {
-                if (event.startTime != null)
-                    clearAlarm(event)
+            Log.d(TAG, "Clearing all alarms")
+            for (intent in alarmList)
+            {
+                val id = intent.getIntExtra("id", 0)
+                val pendingIntent = PendingIntent.getBroadcast(context, id, intent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                alarmManager.cancel(pendingIntent)
             }
+            alarmList.clear()
+            Log.d(TAG, "Cleared alarmList")
         }
 
         private fun clearStartAlarms() {

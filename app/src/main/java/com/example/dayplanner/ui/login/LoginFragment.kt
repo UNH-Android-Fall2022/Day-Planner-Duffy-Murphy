@@ -14,8 +14,11 @@ import com.example.dayplanner.background.UserData.Companion.login
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.example.dayplanner.data.User
+import com.google.firebase.firestore.SetOptions
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,19 +64,26 @@ class LoginFragment : Fragment() {
         AuthUI.IdpConfig.GoogleBuilder().build())
 
     private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val user = FirebaseAuth.getInstance().currentUser
         val response = result.idpResponse
         if (result.resultCode == Activity.RESULT_OK) {
             // Successfully signed in
+            Log.d(TAG, "Sign in successful. Checking if user already exists")
+            db.collection("Users").document("${user?.uid}").get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        Log.d(TAG, "User exists. No modifications necessary")
+                    } else {
+                        Log.d(TAG, "User does not exist, adding user")
+                        db.collection("Users").document("${user?.uid}").set(User(), SetOptions.merge())
+                        userData = User()
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting user: ", exception)
+                }
+
             login()
-//            Log.d(TAG, "Sign in successful. Checking if user already exists")
-//            db.collection("Users").document("${user?.uid}").get()
-//                .addOnSuccessListener { document ->
-//                    Log.d(TAG, "User exists. No modifications necessary")
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.d(TAG, "User probably does not exist, adding user")
-//                    db.collection("Users").document("${user?.uid}").set(User())
-//                }
             val action = LoginFragmentDirections.actionNavigationLoginToNavigationSettings()
             findNavController().navigate(action)
         } else {

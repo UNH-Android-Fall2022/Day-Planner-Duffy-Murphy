@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
+import java.lang.Thread.sleep
 import java.util.*
 
 class SettingsFragment : Fragment() {
@@ -46,6 +48,7 @@ class SettingsFragment : Fragment() {
             val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
             findNavController().navigate(action)
         }  else {
+
             val toolbar: Toolbar = binding.settingsToolbar
             toolbar.title = user.displayName
 
@@ -60,62 +63,48 @@ class SettingsFragment : Fragment() {
                 val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
                 findNavController().navigate(action)
             }
-
-            val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
-            val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
-
-            if (userData!!.startNotifications) {
-                startNotifSwitch.isChecked = true
-                startNotifSwitch.text = getString(R.string.yes)
-            }
-            if (userData!!.endNotifications) {
-                endNotifSwitch.isChecked = true
-                endNotifSwitch.text = getString(R.string.yes)
-            }
-
-            startNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
-                // Responds to switch being checked/unchecked
-                if (isChecked) {
-                    startNotifSwitch.text = getString(R.string.yes)
-                    //Log.d(TAG, "User data: ${userData}")
-                    userData = User(userData!!.defaultScreen,
-                        userData!!.locationServices,
-                        userData!!.etaEnabled,
-                        true,
-                        userData!!.endNotifications)
-                } else {
-                    startNotifSwitch.text = getString(R.string.no)
-                    userData = User(userData!!.defaultScreen,
-                        userData!!.locationServices,
-                        userData!!.etaEnabled,
-                        false,
-                        userData!!.endNotifications)
-                }
-                Firebase.firestore.collection("Users").document(user.uid).set(userData!!, SetOptions.merge())
-                resetAlarms()
-            })
-
-            endNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
-                // Responds to switch being checked/unchecked
-                if (isChecked) {
-                    endNotifSwitch.text = getString(R.string.yes)
-                    userData = User(userData!!.defaultScreen,
-                        userData!!.locationServices,
-                        userData!!.etaEnabled,
-                        userData!!.startNotifications,
-                        true)
-                } else {
-                    endNotifSwitch.text = getString(R.string.no)
-                    userData = User(userData!!.defaultScreen,
-                        userData!!.locationServices,
-                        userData!!.etaEnabled,
-                        userData!!.startNotifications,
-                        false)
-                }
-                Firebase.firestore.collection("Users").document(user.uid).set(userData!!, SetOptions.merge())
-                resetAlarms()
-            })
         }
+
+
+        val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
+        val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
+
+
+        if (userData?.startNotifications != null && userData!!.startNotifications) {
+            startNotifSwitch.isChecked = true
+            startNotifSwitch.text = getString(R.string.yes)
+        }
+        if (userData?.endNotifications != null && userData!!.endNotifications) {
+            endNotifSwitch.isChecked = true
+            endNotifSwitch.text = getString(R.string.yes)
+        }
+
+        startNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                startNotifSwitch.text = getString(R.string.yes)
+                //Log.d(TAG, "User data: ${userData}")
+                userData?.startNotifications = true
+            } else {
+                startNotifSwitch.text = getString(R.string.no)
+                userData?.startNotifications = false
+            }
+            userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
+            resetAlarms()
+        })
+
+        endNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                endNotifSwitch.text = getString(R.string.yes)
+                userData?.endNotifications = true
+            } else {
+                endNotifSwitch.text = getString(R.string.no)
+                userData?.endNotifications = false
+            }
+            userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
+            resetAlarms()
+        })
 
         return root
     }

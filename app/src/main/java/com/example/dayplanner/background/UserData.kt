@@ -101,6 +101,7 @@ class UserData {
 //                        db.collection("Users/${user}/events").document(document.id).delete()
                         DB_PULL_COMPLETED = true
                     }
+                    Log.d(TAG, "Getting user")
                     //Needs to be called in order so certain functions work
                     getUser(uid)
                 }

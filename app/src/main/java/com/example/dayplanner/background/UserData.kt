@@ -205,6 +205,8 @@ class UserData {
 
         //Clears all alarms for 1 event
         fun clearEventAlarms(event: Event) {
+            Log.d(TAG, "Clearing event alarms")
+            val deletedAlarms: ArrayList<Intent> = ArrayList()
             if (event.startTime != null) {
                 for (intent in alarmList) {
                     val eventStart = event.startTime.time
@@ -215,12 +217,14 @@ class UserData {
                         val id = intent.getIntExtra("id", 0)
                         val pendingIntent = PendingIntent.getBroadcast(
                             context, id, intent,
-                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                            PendingIntent.FLAG_IMMUTABLE
                         )
                         alarmManager.cancel(pendingIntent)
-                        alarmList.remove(intent)
+                        deletedAlarms.add(intent)
+                        Log.d(TAG, "Cleared alarm")
                     }
                 }
+                alarmList.removeAll(deletedAlarms)
             } else {
                 Log.w(TAG, "Tried to delete alarm for an event without a start time")
             }
@@ -231,14 +235,16 @@ class UserData {
         {
             if (event.startTime != null) {
                 val alarmTime = if (startAlarm) event.startTime.time else event.startTime.time + event.duration
+                val deletedAlarms: ArrayList<Intent> = ArrayList()
                 for (intent in alarmList) {
                     if (alarmTime == intent.getLongExtra("startTime", 0)) {
                         val id = intent.getIntExtra("id", 0)
                         val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                         alarmManager.cancel(pendingIntent)
-                        alarmList.remove(intent)
+                        deletedAlarms.add(intent)
                     }
                 }
+                alarmList.removeAll(deletedAlarms)
             } else {
                 Log.w(TAG, "Tried to delete alarm for an event without a start time")
             }

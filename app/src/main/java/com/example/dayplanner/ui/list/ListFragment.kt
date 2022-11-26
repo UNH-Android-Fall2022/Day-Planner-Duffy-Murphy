@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
+import com.example.dayplanner.background.UserData
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
@@ -83,6 +84,7 @@ open class ListFragment : Fragment() {
                                 .delete()
                         }
                     }
+                UserData.clearEventAlarms(event)
             }
             eventList.removeAt(listAdapterPosition)
             mRecyclerView.adapter?.notifyItemRemoved(listAdapterPosition)

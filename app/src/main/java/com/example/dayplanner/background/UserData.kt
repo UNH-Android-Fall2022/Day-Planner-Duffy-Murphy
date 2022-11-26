@@ -23,62 +23,59 @@ import kotlin.collections.ArrayList
 import kotlin.random.Random.Default.nextInt
 
 class UserData {
-
-    //Most of the inspiration for this comes from
-    //https://proandroiddev.com/everything-you-need-to-know-about-adding-notifications-with-alarm-manager-in-android-cb94a92b3235
-    private class NotificationAlarm: BroadcastReceiver() {
-        override fun onReceive(p0: Context?, p1: Intent?) {
-            Log.d(TAG, "NotificationAlarm onReceive function was called")
-            val eventName: String? = p1?.extras?.getString("name")
-            val _eventStart: Boolean? = p1?.extras?.getBoolean("eventStart")
-            val _id: Int? = p1?.extras?.getInt("id")
-            val eventStart: Boolean = if (_eventStart != null) _eventStart else true
-            val id: Int = if (_id != null) _id else nextInt(0, Int.MAX_VALUE - 1)
-
-            val tapIntent: Intent =  Intent (p0, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-            }
-            val pendingIntent: PendingIntent = PendingIntent.getActivity(p0, 0, tapIntent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-
-            var builder: NotificationCompat.Builder?
-
-            if (eventStart) {
-                builder = p0?.let {
-                    NotificationCompat.Builder(it, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_baseline_alarm_24)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setContentIntent(pendingIntent)
-                        .setAutoCancel(true)
-                        .setContentTitle("Event Started")
-                        .setContentText("Time for ${eventName}")
-                }
-            } else {
-                builder = p0?.let {
-                    NotificationCompat.Builder(it, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_baseline_alarm_24)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setContentIntent(pendingIntent)
-                        .setAutoCancel(true)
-                        .setContentTitle("Event Ended")
-                        .setContentText("Time to stop ${eventName}")
-                }
-            }
-
-            builder?.let {
-                p0?.let { with(NotificationManagerCompat.from(it)) {
-                    notify(id, builder.build())
-                    Log.d(TAG, "notification sent")
-                } }
-            }
-
-
-        }
-    }
-
     companion object {
         val alarmManager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         private val alarmList: ArrayList<Intent> = ArrayList()
+
+        //Most of the inspiration for this comes from
+        //https://proandroiddev.com/everything-you-need-to-know-about-adding-notifications-with-alarm-manager-in-android-cb94a92b3235
+        val NotificationAlarm = object : BroadcastReceiver() {
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                Log.d(TAG, "NotificationAlarm onReceive function was called")
+                val eventName: String? = p1?.extras?.getString("eventName")
+                val _eventStart: Boolean? = p1?.extras?.getBoolean("eventStart")
+                val _id: Int? = p1?.extras?.getInt("id")
+                val eventStart: Boolean = if (_eventStart != null) _eventStart else true
+                val id: Int = if (_id != null) _id else nextInt(0, Int.MAX_VALUE - 1)
+
+                val tapIntent: Intent =  Intent (p0, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
+                val pendingIntent: PendingIntent = PendingIntent.getActivity(p0, 0, tapIntent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+                var builder: NotificationCompat.Builder?
+
+                if (eventStart) {
+                    builder = p0?.let {
+                        NotificationCompat.Builder(it, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.ic_baseline_alarm_24)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true)
+                            .setContentTitle("Event Started")
+                            .setContentText("Time for ${eventName}")
+                    }
+                } else {
+                    builder = p0?.let {
+                        NotificationCompat.Builder(it, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.ic_baseline_alarm_24)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true)
+                            .setContentTitle("Event Ended")
+                            .setContentText("Time to stop ${eventName}")
+                    }
+                }
+
+                builder?.let {
+                    p0?.let { with(NotificationManagerCompat.from(it)) {
+                        notify(id, builder.build())
+                        Log.d(TAG, "notification sent")
+                    } }
+                }
+            }
+        }
 
         private fun getEvents(uid: String) {
             val db = Firebase.firestore
@@ -141,11 +138,11 @@ class UserData {
                         if (Date(eventTime).after(Date())) {
                             val id = nextInt(0, Int.MAX_VALUE - 1)
 
-                            val alarmIntent = Intent(context, NotificationAlarm::class.java)
-                            alarmIntent.putExtra("id", id)
-                            alarmIntent.putExtra("eventName", event.eventName)
-                            alarmIntent.putExtra("eventStart", true)
-                            alarmIntent.putExtra("startTime", eventTime)
+                            val alarmIntent = Intent(LOCAL_NOTIFICATION)
+                                .putExtra("id", id)
+                                .putExtra("eventName", event.eventName)
+                                .putExtra("eventStart", true)
+                                .putExtra("startTime", eventTime)
 
                             val pendingIntent = PendingIntent.getBroadcast(
                                 context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -169,11 +166,11 @@ class UserData {
                         if (Date(eventTime).after(Date())) {
                             val id = nextInt(0, Int.MAX_VALUE - 1)
 
-                            val alarmIntent = Intent(context, NotificationAlarm::class.java)
-                            alarmIntent.putExtra("id", id)
-                            alarmIntent.putExtra("eventName", event.eventName)
-                            alarmIntent.putExtra("eventStart", false)
-                            alarmIntent.putExtra("startTime", eventTime)
+                            val alarmIntent = Intent(LOCAL_NOTIFICATION)
+                                .putExtra("id", id)
+                                .putExtra("eventName", event.eventName)
+                                .putExtra("eventStart", false)
+                                .putExtra("startTime", eventTime)
 
                             val pendingIntent = PendingIntent.getBroadcast(
                                 context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)

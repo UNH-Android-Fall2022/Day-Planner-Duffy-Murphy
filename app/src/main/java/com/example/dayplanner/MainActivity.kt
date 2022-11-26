@@ -3,6 +3,7 @@ package com.example.dayplanner
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.dayplanner.background.UserData
 import com.example.dayplanner.data.User
 import com.example.dayplanner.databinding.ActivityMainBinding
 import com.example.dayplanner.background.UserData.Companion.startup
@@ -22,6 +24,7 @@ import java.util.*
 
 
 val TAG = "DayPlanner"
+val LOCAL_NOTIFICATION = "Local Notification"
 var DB_PULL_COMPLETED: Boolean = false
 var CHANNEL_ID: String = "Day Planner App Notification Channel"
 var userData: User? = null
@@ -61,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         val timeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
         Log.d(TAG, "Current time and day: ${timeFormat.format(Date())}")
-
+        context.registerReceiver(UserData.Companion.NotificationAlarm, IntentFilter(LOCAL_NOTIFICATION))
         val user = Firebase.auth.currentUser
         if (user != null) {
             startup(user.uid)

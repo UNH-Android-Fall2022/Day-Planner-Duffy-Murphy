@@ -78,7 +78,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/start_notif_options"
                     app:layout_constraintTop_toTopOf="@+id/start_notif_options"
                     app:layout_constraintBottom_toBottomOf="@+id/start_notif_options"
-                    android:text="@string/switch_default_text"
+                    android:text="@string/no"
                     android:textSize="18sp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -107,7 +107,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/end_notif_options"
                     app:layout_constraintTop_toTopOf="@+id/end_notif_options"
                     app:layout_constraintBottom_toBottomOf="@+id/end_notif_options"
-                    android:text="@string/switch_default_text"
+                    android:text="@string/no"
                     android:textSize="18sp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 

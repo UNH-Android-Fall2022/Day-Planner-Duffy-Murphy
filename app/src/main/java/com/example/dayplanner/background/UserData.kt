@@ -15,6 +15,7 @@ import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.util.*
 import kotlin.collections.ArrayList
@@ -100,7 +101,7 @@ class UserData {
 //                        db.collection("Users/${user}/events").document(document.id).delete()
                         DB_PULL_COMPLETED = true
                     }
-                    //Needs to be called in order for certain functions
+                    //Needs to be called in order so certain functions work
                     getUser(uid)
                 }
                 .addOnFailureListener { exception ->
@@ -115,7 +116,8 @@ class UserData {
                 .addOnSuccessListener { user ->
                     Log.d(TAG, "User data pulled")
                     userData = user.toObject(User::class.java)
-                    //Needs to be called in order for this function to work
+                    Log.d(TAG, "User data: ${userData}")
+                    //Needs to be called in order so this function can work
                     setAllAlarms()
                 }
                 .addOnFailureListener { exception ->
@@ -161,20 +163,7 @@ class UserData {
                         alarmList.add(alarmIntent)
                     }
                 } else {
-                    for (intent in alarmList)
-                    {
-                        val eventStart = oldEvent.startTime!!.time
-                        val eventEnd = eventStart + oldEvent.duration
-
-                        val alarmTime = intent.getLongExtra("startTime", 0)
-                        if (alarmTime == eventStart || alarmTime == eventEnd)
-                        {
-                            val id = intent.getIntExtra("id", 0)
-                            val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            alarmManager.cancel(pendingIntent)
-                            alarmList.remove(intent)
-                        }
-                    }
+                    clearAlarm(oldEvent)
                     setAlarm(event)
                 }
 
@@ -186,8 +175,25 @@ class UserData {
         }
 
         fun clearAlarm(event: Event) {
-            clearOneAlarm(event, true)
-            clearOneAlarm(event, false)
+            if (event.startTime != null) {
+                for (intent in alarmList) {
+                    val eventStart = event.startTime.time
+                    val eventEnd = eventStart + event.duration
+
+                    val alarmTime = intent.getLongExtra("startTime", 0)
+                    if (alarmTime == eventStart || alarmTime == eventEnd) {
+                        val id = intent.getIntExtra("id", 0)
+                        val pendingIntent = PendingIntent.getBroadcast(
+                            context, id, intent,
+                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                        )
+                        alarmManager.cancel(pendingIntent)
+                        alarmList.remove(intent)
+                    }
+                }
+            } else {
+                Log.w(TAG, "Tried to delete alarm for an event without a start time")
+            }
         }
 
         private fun clearOneAlarm(event: Event, startAlarm: Boolean)
@@ -216,12 +222,33 @@ class UserData {
         }
 
         private fun clearAllAlarms() {
+            for (event in eventList) {
+                if (event.startTime != null)
+                    clearAlarm(event)
+            }
+        }
+
+        private fun clearStartAlarms() {
             for (event in eventList)
             {
                 if (event.startTime != null) {
-                    clearAlarm(event)
+                    clearOneAlarm(event, true)
                 }
             }
+        }
+
+        private fun clearEndAlarms() {
+            for (event in eventList)
+            {
+                if (event.startTime != null) {
+                    clearOneAlarm(event, false)
+                }
+            }
+        }
+
+        fun resetAlarms() {
+            clearAllAlarms()
+            setAllAlarms()
         }
 
         fun login() {

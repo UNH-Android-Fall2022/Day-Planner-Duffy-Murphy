@@ -17,6 +17,8 @@
     <string name="list_item_button_name">Add</string>
     <string name="default_time">00:00 AM</string>
     <string name="switch_default_text">No</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
     <string name="sign_out">Sign Out</string>
     <string name="login">You are not currently logged in!</string>
     <string name="signin">Sign in or\n Sign up</string>

@@ -20,6 +20,7 @@ class PlannerAdapter (
         val startTime: TextView = itemView.findViewById(R.id.start_time)
         val endTime: TextView = itemView.findViewById(R.id.end_time)
         val name: TextView = itemView.findViewById(R.id.event_name)
+        val location: TextView = itemView.findViewById(R.id.event_location)
         val view: ConstraintLayout = itemView.findViewById(R.id.constraint)
     }
 
@@ -30,11 +31,14 @@ class PlannerAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int){
-        val (startTime, endTime, name, duration) = eventList[position]
+        val (startTime, endTime, name, duration, location) = eventList[position]
 
         holder.startTime.text = startTime
         holder.endTime.text = endTime
         holder.name.text = name
+        holder.location.text = location
+
+        Log.d("my special tag", "Location text is: " + holder.location.text)
         //Card height changes based on the duration of the event
         holder.view.minHeight = duration / 10000
 

@@ -23,6 +23,7 @@ import com.example.dayplanner.background.UserData
 import com.example.dayplanner.databinding.FragmentListAddBinding
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
+import com.example.dayplanner.userData
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -90,6 +91,14 @@ class ListAddFragment() : Fragment() {
             }
         })
 
+        // Hide the map and location if location services are turned off.
+        if (userData != null) {
+            if (userData!!.locationServices) {
+                binding.evtLocation.visibility = View.VISIBLE
+            } else {
+                binding.evtLocation.visibility = View.GONE
+            }
+        }
 
         val button = binding.listAddSubmit
         button.setOnClickListener() {

@@ -68,7 +68,7 @@ class SettingsFragment : Fragment() {
 
         val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
         val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
-
+        val locationServSwitch: SwitchMaterial = binding.locationServSwitch
 
         if (userData?.startNotifications != null && userData!!.startNotifications) {
             startNotifSwitch.isChecked = true
@@ -77,6 +77,10 @@ class SettingsFragment : Fragment() {
         if (userData?.endNotifications != null && userData!!.endNotifications) {
             endNotifSwitch.isChecked = true
             endNotifSwitch.text = getString(R.string.yes)
+        }
+        if (userData?.locationServices != null && userData!!.locationServices) {
+            locationServSwitch.isChecked = true
+            locationServSwitch.text = getString(R.string.yes)
         }
 
         startNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -104,6 +108,19 @@ class SettingsFragment : Fragment() {
             }
             userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
             resetAlarms()
+        })
+
+        locationServSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            // Responds to switch being checked/unchecked
+            if (isChecked) {
+                locationServSwitch.text = getString(R.string.yes)
+                userData?.locationServices = true
+            } else {
+                locationServSwitch.text = getString(R.string.no)
+                userData?.locationServices = false
+            }
+            userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
+            // No need to call any functions, as onResume() will update the necessary RecyclerViews
         })
 
         return root

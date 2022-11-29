@@ -1,6 +1,7 @@
 package com.example.dayplanner.ui.planner
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,7 +63,6 @@ class PlannerFragment : Fragment() {
 
         val eventRecyclerList: ArrayList<PlannerItem> = ArrayList()
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT)
-
         val plannerList: ArrayList<Event> = ArrayList()
 
         for(item in eventList){
@@ -84,15 +84,17 @@ class PlannerFragment : Fragment() {
         plannerList.sortBy { it.startTime }
 
         for(item in plannerList){
-            if (item.startTime != null)
+            if (item.startTime != null) {
                 eventRecyclerList.add(
                     PlannerItem(
                         timeFormat.format(item.startTime),
                         timeFormat.format(Date(item.startTime.time + item.duration)),
                         item.eventName,
-                        item.duration
+                        item.duration,
+                        item.location // TODO: This might not work
                     )
                 )
+            }
         }
 
         mRecyclerView = binding.plannerEvents

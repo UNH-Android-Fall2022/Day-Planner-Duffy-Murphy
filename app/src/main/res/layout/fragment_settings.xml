@@ -111,6 +111,34 @@
                     android:textSize="18sp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/location_serv_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border"
+                android:layout_margin="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/end_notif_options">
+                <TextView
+                    android:id="@+id/location_serv_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:text="@string/location_services"
+                    app:layout_constraintTop_toTopOf="@+id/location_serv_options"
+                    app:layout_constraintStart_toStartOf="@+id/location_serv_options"
+                    app:layout_constraintBottom_toBottomOf="@+id/location_serv_options"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/location_serv_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@+id/location_serv_options"
+                    app:layout_constraintTop_toTopOf="@+id/location_serv_options"
+                    app:layout_constraintBottom_toBottomOf="@+id/location_serv_options"
+                    android:text="@string/no"
+                    android:textSize="18sp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

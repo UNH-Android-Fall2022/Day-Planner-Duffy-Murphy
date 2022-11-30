@@ -27,6 +27,7 @@
     <string name="start_notifications">Start notifications</string>
     <string name="end_notifications">End notifications</string>
     <string name="location_services">Location Services</string>
+    <string name="find_a_location"><u>Find a location!</u></string>
 
     <string-array name="evt_recurring_options">
         <item>No</item>

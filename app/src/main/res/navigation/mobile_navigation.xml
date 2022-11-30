@@ -42,7 +42,18 @@
         <action
             android:id="@+id/action_navigation_list_add_to_navigation_list"
             app:destination="@id/navigation_list" />
+        <action
+            android:id="@+id/action_navigation_list_add_to_navigation_list_add_map"
+            app:destination="@id/navigation_list_add_map" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_list_add_map"
+        android:name="com.example.dayplanner.ui.list_add.ListAddMapFragment"
+        android:label="Select Location"
+        tools:layout="@layout/fragment_list_add_map" >
+    </fragment>
+
     <fragment
         android:id="@+id/navigation_login"
         android:name="com.example.dayplanner.ui.login.LoginFragment"

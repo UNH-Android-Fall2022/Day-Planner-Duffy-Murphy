@@ -1,5 +1,7 @@
 package com.example.dayplanner.ui.list_add
 
+// Google maps
+
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -9,29 +11,36 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.CompoundButton
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import com.example.dayplanner.ui.list.ListFragment
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.background.UserData
-import com.example.dayplanner.databinding.FragmentListAddBinding
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
+import com.example.dayplanner.databinding.FragmentListAddBinding
+import com.example.dayplanner.ui.list.ListFragmentDirections
+import com.example.dayplanner.ui.list_add.ListAddFragmentDirections
 import com.example.dayplanner.userData
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
+
+//import com.example.dayplanner.ui.list_add.WorkAroundMapFragment
+//import com.google.android.gms.maps.OnMapReadyCallback
 
 class ListAddFragment() : Fragment() {
 
@@ -40,6 +49,7 @@ class ListAddFragment() : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private var mMap: MapView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,9 +105,17 @@ class ListAddFragment() : Fragment() {
         if (userData != null) {
             if (userData!!.locationServices) {
                 binding.evtLocation.visibility = View.VISIBLE
+                binding.evtLocationLink.visibility = View.VISIBLE
             } else {
                 binding.evtLocation.visibility = View.GONE
+                binding.evtLocationLink.visibility = View.GONE
             }
+        }
+
+        binding.evtLocationLink.setOnClickListener() {
+            // TODO: Navigate to map fragment
+            val action = ListAddFragmentDirections.actionNavigationListAddToNavigationListAddMap()
+            findNavController().navigate(action)
         }
 
         val button = binding.listAddSubmit

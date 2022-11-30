@@ -7,18 +7,18 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.dayplanner.background.UserData
+import com.example.dayplanner.background.UserData.Companion.startup
 import com.example.dayplanner.data.User
 import com.example.dayplanner.databinding.ActivityMainBinding
-import com.example.dayplanner.background.UserData.Companion.startup
-import com.google.firebase.ktx.Firebase
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
 import java.util.*
 

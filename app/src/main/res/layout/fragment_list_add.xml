@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/list_add_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="vertical"
     android:scrollbarSize="8dp"
     android:scrollbarThumbVertical="@color/gray"
-    android:layout_marginBottom="70dp">
+    android:layout_marginBottom="70dp"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -134,7 +137,18 @@
             android:layout_marginTop="@dimen/list_add_spacing"
             android:background="@drawable/border"
             android:hint="@string/evt_location"
-            android:visibility="gone" />
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/evt_location_link"
+            android:layout_width="100dp"
+            android:layout_height="75dp"
+            android:text="@string/find_a_location"
+            android:textSize="26dp"
+            android:layout_marginTop="@dimen/list_add_spacing"
+            android:textColor="@color/steel_blue"
+            android:textAlignment="center"
+            />
 
         <Button
             android:id="@+id/list_add_submit"
@@ -142,7 +156,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_marginTop="@dimen/list_add_big_margin"
             android:text="@string/create" />
-        
+
     </LinearLayout>
 </ScrollView>
 <!--Compare these later-->

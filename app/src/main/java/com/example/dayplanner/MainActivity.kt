@@ -75,15 +75,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Strictly for returning from Google map
-    override fun onResume() {
-        super.onResume()
-        location = this.intent.extras?.getString("loc")
-        // Crude way to check if we are returning from the MapsActivity
-        if (location != null) {
-            val navController = findNavController(R.id.nav_host_fragment_activity_main)
-            navController.navigate(R.id.navigation_list_add)
-        }
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        location = this.intent.extras?.getString("loc")
+//        // Crude way to check if we are returning from the MapsActivity
+//        if (location != null) {
+//            val navController = findNavController(R.id.nav_host_fragment_activity_main)
+//            navController.navigate(R.id.navigation_list_add)
+//        }
+//        this.intent.extras?.clear()
+//    }
 
     private fun createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because

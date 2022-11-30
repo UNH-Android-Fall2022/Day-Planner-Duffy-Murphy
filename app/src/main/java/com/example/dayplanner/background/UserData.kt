@@ -317,6 +317,7 @@ class UserData {
             eventList.clear()
             DB_PULL_COMPLETED = false
             userData = null
+            MainActivity.location = null
         }
 
         fun startup (uid: String) {

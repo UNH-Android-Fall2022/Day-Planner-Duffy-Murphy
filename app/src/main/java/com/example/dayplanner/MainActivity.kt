@@ -25,7 +25,7 @@ import java.text.DateFormat
 import java.util.*
 
 
-val TAG = "DayPlanner"
+val TAG = "my special tag"
 val LOCAL_NOTIFICATION = "Local Notification"
 var DB_PULL_COMPLETED: Boolean = false
 var CHANNEL_ID: String = "Day Planner App Notification Channel"
@@ -83,6 +83,7 @@ class MainActivity : AppCompatActivity() {
             val navController = findNavController(R.id.nav_host_fragment_activity_main)
             navController.navigate(R.id.navigation_list_add)
         }
+        this.intent.extras?.clear()
     }
 
     private fun createNotificationChannel() {

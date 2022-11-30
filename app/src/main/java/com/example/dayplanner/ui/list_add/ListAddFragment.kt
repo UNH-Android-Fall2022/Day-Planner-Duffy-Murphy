@@ -212,7 +212,7 @@ class ListAddFragment() : Fragment() {
             // the deletion
 //            eventList.removeAt(listAdapterPosition)
             if (event.startTime != null) {
-                binding.evtStartTimeText.setText(DateFormat.getTimeInstance(DateFormat.SHORT)
+                binding.evtStartTime.setText(DateFormat.getTimeInstance(DateFormat.SHORT)
                     .format(event.startTime))
                 binding.switchStartTime.isChecked = true
             }

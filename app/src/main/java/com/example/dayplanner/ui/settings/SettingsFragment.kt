@@ -48,7 +48,6 @@ class SettingsFragment : Fragment() {
             val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
             findNavController().navigate(action)
         }  else {
-
             val toolbar: Toolbar = binding.settingsToolbar
             toolbar.title = user.displayName
 

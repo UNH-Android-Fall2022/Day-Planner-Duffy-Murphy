@@ -111,6 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 newMarker?.showInfoWindow()
             }
         }
+
     }
 
     private fun getCurrentLocation() {

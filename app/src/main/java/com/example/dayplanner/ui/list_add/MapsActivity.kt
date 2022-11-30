@@ -12,7 +12,6 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.InflateException
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.dayplanner.databinding.ListAddMapBinding
@@ -26,7 +25,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import java.io.IOException
 import java.util.*
 
 
@@ -50,6 +48,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        binding.mapFloatingActionButton.setOnClickListener() {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("loc", location)
+            startActivity(intent)
+        }
     }
 
     /**

@@ -14,7 +14,12 @@ import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import com.example.dayplanner.MainActivity.Companion.context
 import com.example.dayplanner.databinding.ListAddMapBinding
+import com.example.dayplanner.ui.list.ListFragmentDirections
+import com.example.dayplanner.ui.list_add.ListAddFragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,6 +40,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var newMarker: Marker? = null
     private var latLng: LatLng? = null
     private var location: Location? = null
+    private var title: String = ""
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +57,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding.mapFloatingActionButton.setOnClickListener() {
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("loc", location)
+            intent.putExtra("loc", title)
             startActivity(intent)
         }
     }
@@ -87,15 +93,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 address = addresses.get(0)?.getAddressLine(0) //0 to obtain first possible address
             }
 
-            var title: String = ""
             if (address != null) {
-                val city: String = addresses.get(0)?.getLocality() ?: ""
-                val state: String = addresses.get(0)?.getAdminArea() ?: ""
-                val country: String = addresses.get(0)?.getCountryName() ?: ""
-                val postalCode: String = addresses.get(0)?.getPostalCode() ?: ""
-                //create your custom title
-                title = "$address-$city-$state"
-
+//                val city: String = addresses.get(0)?.getLocality() ?: ""
+//                val state: String = addresses.get(0)?.getAdminArea() ?: ""
+//                val country: String = addresses.get(0)?.getCountryName() ?: ""
+//                val postalCode: String = addresses.get(0)?.getPostalCode() ?: ""
+//                title = "$address $state $postalCode"
+                title = "$address"
                 //remove previously placed Marker
                 newMarker?.remove()
 
@@ -110,9 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getCurrentLocation() {
-        Log.d("my special tag", "made it herebtwlol")
         if (checkPermissions()) {
-            Log.d("my special tag", "made it here")
             if (isLocationEnabled()) {
                 if (ActivityCompat.checkSelfPermission(
                         this,
@@ -122,6 +124,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         android.Manifest.permission.ACCESS_COARSE_LOCATION
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
+                    // Do nothing I guess
                 }
                 fusedLocationProviderClient.lastLocation.addOnCompleteListener(this) { task ->
                     location = task.result

@@ -1,5 +1,6 @@
 package com.example.dayplanner
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -16,6 +17,7 @@ import com.example.dayplanner.background.UserData
 import com.example.dayplanner.background.UserData.Companion.startup
 import com.example.dayplanner.data.User
 import com.example.dayplanner.databinding.ActivityMainBinding
+import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         lateinit var context: Context
         var listAdapterPosition: Int = -1
+        var location: String? = null
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         context = this
@@ -68,6 +71,17 @@ class MainActivity : AppCompatActivity() {
         val user = Firebase.auth.currentUser
         if (user != null) {
             startup(user.uid)
+        }
+    }
+
+    // Strictly for returning from Google map
+    override fun onResume() {
+        super.onResume()
+        location = this.intent.extras?.getString("loc")
+        // Crude way to check if we are returning from the MapsActivity
+        if (location != null) {
+            val navController = findNavController(R.id.nav_host_fragment_activity_main)
+            navController.navigate(R.id.navigation_list_add)
         }
     }
 

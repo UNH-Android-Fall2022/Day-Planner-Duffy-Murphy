@@ -16,6 +16,7 @@ import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
+import com.example.dayplanner.MainActivity.Companion.location
 import com.example.dayplanner.MapsActivity
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
@@ -127,7 +128,7 @@ class ListAddFragment() : Fragment() {
             }
             // TODO: Add recurring events
 //            val recurring = binding.switchRecurring.isChecked.toString()
-            val location = binding.evtLocation.text.toString()
+            val evtLocation = binding.evtLocation.text.toString()
 
             var isValidEvent = true
 
@@ -180,7 +181,7 @@ class ListAddFragment() : Fragment() {
             if (isValidEvent) {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
-                val event: Event = Event(startTime, duration, title) // title is already title.toString()
+                val event: Event = Event(startTime, duration, title, evtLocation) // title is already title.toString()
                 eventList.add(event)
 
                 val user = Firebase.auth.currentUser
@@ -219,6 +220,12 @@ class ListAddFragment() : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Location is companion object
+        binding.evtLocation.setText(location)
+        location = "" // Do this because it could autofill the next time list_add is open
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

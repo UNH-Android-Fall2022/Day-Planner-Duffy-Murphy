@@ -38,7 +38,6 @@ class PlannerAdapter (
         holder.name.text = name
         holder.location.text = location
 
-        Log.d("my special tag", "Location text is: " + holder.location.text)
         //Card height changes based on the duration of the event
         holder.view.minHeight = duration / 10000
 

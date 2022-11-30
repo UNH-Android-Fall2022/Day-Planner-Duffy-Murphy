@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,24 +14,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
+import com.example.dayplanner.MapsActivity
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.background.UserData
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
-import com.example.dayplanner.ui.list.ListFragmentDirections
-import com.example.dayplanner.ui.list_add.ListAddFragmentDirections
 import com.example.dayplanner.userData
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -114,8 +108,8 @@ class ListAddFragment() : Fragment() {
 
         binding.evtLocationLink.setOnClickListener() {
             // TODO: Navigate to map fragment
-            val action = ListAddFragmentDirections.actionNavigationListAddToNavigationListAddMap()
-            findNavController().navigate(action)
+            val intent = Intent(activity, MapsActivity::class.java)
+            startActivity(intent)
         }
 
         val button = binding.listAddSubmit

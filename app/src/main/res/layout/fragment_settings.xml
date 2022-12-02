@@ -35,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/app_blue"
             android:text="@string/sign_out"
             android:layout_gravity="end"
             />

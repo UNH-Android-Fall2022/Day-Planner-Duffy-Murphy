@@ -27,7 +27,7 @@
 
         <EditText
             android:id="@+id/evt_title"
-            android:textSize="26sp"
+            android:textSize="@dimen/list_add_text_size"
             android:maxLines="1"
             android:maxLength="50"
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
 
         <EditText
             android:id="@+id/evt_duration"
-            android:textSize="26sp"
+            android:textSize="@dimen/list_add_text_size"
             android:maxLines="1"
             android:maxLength="50"
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:textSize="26sp"
+                android:textSize="@dimen/list_add_text_size"
                 android:text="@string/start_time" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/list_add_spacing"
-                android:textSize="26sp"
+                android:textSize="@dimen/list_add_text_size"
                 android:text="@string/default_time" />
         </LinearLayout>
 
@@ -109,7 +109,7 @@
                 android:id="@+id/evt_recurring"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="26sp"
+                android:textSize="@dimen/list_add_text_size"
                 android:textAlignment="center"
                 android:text="@string/evt_recurring"
                 android:layout_marginTop="4dp" />
@@ -125,7 +125,7 @@
 
         <EditText
             android:id="@+id/evt_location"
-            android:textSize="26sp"
+            android:textSize="@dimen/list_add_text_size"
             android:maxLines="1"
             android:maxLength="50"
             android:layout_width="match_parent"
@@ -141,10 +141,10 @@
 
         <TextView
             android:id="@+id/evt_location_link"
-            android:layout_width="100dp"
-            android:layout_height="75dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/find_a_location"
-            android:textSize="26dp"
+            android:textSize="23dp"
             android:layout_marginTop="@dimen/list_add_spacing"
             android:textColor="@color/steel_blue"
             android:textAlignment="center"
@@ -154,6 +154,7 @@
             android:id="@+id/list_add_submit"
             android:layout_width="@dimen/button_width"
             android:layout_height="@dimen/button_height"
+            android:backgroundTint="@color/app_blue"
             android:layout_marginTop="@dimen/list_add_big_margin"
             android:text="@string/create" />
 

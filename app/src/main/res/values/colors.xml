@@ -10,4 +10,6 @@
     <color name="gray">#808080</color>
     <color name="steel_blue">#4682B4</color>
     <color name="cornflow_blue">#6495ED</color>
+    <color name="app_blue">#5B9BD5</color>
+    <color name="app_secondary_blue">#2F5597</color>
 </resources>

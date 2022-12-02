@@ -54,6 +54,7 @@ class PlannerAdapter (
         }
 
         holder.buttonMap.setOnClickListener {
+            // Adapted from https://stackoverflow.com/questions/6205827/how-to-open-standard-google-map-application-from-my-application
             val theAddress = (holder.location.text as String).replace(" ", "+")
             val uri: String = String.format(Locale.getDefault(), "geo:0,0?q=${theAddress}")
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))

@@ -98,6 +98,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 //remove previously placed Marker
                 newMarker?.remove()
 
+                // Replace the search string too
+                binding.mapSearchText.setText(title)
+
                 //place marker where user just clicked
                 newMarker = mMap.addMarker(
                     MarkerOptions().position(point).title(title)

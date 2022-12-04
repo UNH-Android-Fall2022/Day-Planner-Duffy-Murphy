@@ -123,12 +123,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 // remove any old markers to avoid confusion
                 newMarker?.remove()
 
+                // Replace the search string too
+                binding.mapSearchText.setText(title)
+
                 // add a marker so the user knows what's going on
                 newMarker = mMap.addMarker(
                     MarkerOptions().position(point).title(searchString)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                 )
-
+                newMarker?.showInfoWindow()
                 // Also move the camera
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(point))
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15F))

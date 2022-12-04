@@ -30,6 +30,9 @@
     <string name="find_a_location"><u>Find a location!</u></string>
     <string name="remove">Remove</string>
     <string name="edit">Edit</string>
+    <string name="search_a_location">Search a location!</string>
+    <string name="search">Search</string>
+    <string name="map_return">Return</string>
 
     <string-array name="evt_recurring_options">
         <item>No</item>

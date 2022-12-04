@@ -43,6 +43,7 @@
             android:id="@+id/action_navigation_list_add_to_navigation_list"
             app:destination="@id/navigation_list" />
     </fragment>
+
     <fragment
         android:id="@+id/navigation_login"
         android:name="com.example.dayplanner.ui.login.LoginFragment"

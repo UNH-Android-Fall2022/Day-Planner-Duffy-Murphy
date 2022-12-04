@@ -25,7 +25,7 @@ import java.text.DateFormat
 import java.util.*
 
 
-val TAG = "my special tag"
+val TAG = "DayPlanner"
 val LOCAL_NOTIFICATION = "Local Notification"
 var DB_PULL_COMPLETED: Boolean = false
 var CHANNEL_ID: String = "Day Planner App Notification Channel"
@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         createNotificationChannel()
-        notificationManager.cancelAll()
 
         val timeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
         Log.d(TAG, "Current time and day: ${timeFormat.format(Date())}")
@@ -77,6 +76,9 @@ class MainActivity : AppCompatActivity() {
     // Strictly for returning from Google map
     override fun onResume() {
         super.onResume()
+
+        notificationManager.cancelAll()
+
         location = this.intent.extras?.getString("loc")
         // Crude way to check if we are returning from the MapsActivity
         if (location != null) {

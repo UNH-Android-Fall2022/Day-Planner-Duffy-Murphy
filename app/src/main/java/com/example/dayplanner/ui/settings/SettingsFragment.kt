@@ -48,7 +48,6 @@ class SettingsFragment : Fragment() {
             val action = SettingsFragmentDirections.actionNavigationSettingsToNavigationLogin()
             findNavController().navigate(action)
         }  else {
-
             val toolbar: Toolbar = binding.settingsToolbar
             toolbar.title = user.displayName
 
@@ -65,10 +64,9 @@ class SettingsFragment : Fragment() {
             }
         }
 
-
         val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
         val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
-
+        val locationServSwitch: SwitchMaterial = binding.locationServSwitch
 
         if (userData?.startNotifications != null && userData!!.startNotifications) {
             startNotifSwitch.isChecked = true
@@ -78,35 +76,80 @@ class SettingsFragment : Fragment() {
             endNotifSwitch.isChecked = true
             endNotifSwitch.text = getString(R.string.yes)
         }
+        if (userData?.locationServices != null && userData!!.locationServices) {
+            locationServSwitch.isChecked = true
+            locationServSwitch.text = getString(R.string.yes)
+        }
 
-        startNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        startNotifSwitch.setOnClickListener ()
+        {
             // Responds to switch being checked/unchecked
-            if (isChecked) {
+            if (startNotifSwitch.isChecked) {
                 startNotifSwitch.text = getString(R.string.yes)
                 //Log.d(TAG, "User data: ${userData}")
                 userData?.startNotifications = true
             } else {
                 startNotifSwitch.text = getString(R.string.no)
                 userData?.startNotifications = false
+                Log.d(TAG, "Setting start notifications to false")
             }
+            Log.d(TAG, "Setting user data")
             userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
             resetAlarms()
-        })
+        }
 
-        endNotifSwitch.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        endNotifSwitch.setOnClickListener ()
+        {
             // Responds to switch being checked/unchecked
-            if (isChecked) {
+            if (endNotifSwitch.isChecked) {
                 endNotifSwitch.text = getString(R.string.yes)
                 userData?.endNotifications = true
             } else {
                 endNotifSwitch.text = getString(R.string.no)
                 userData?.endNotifications = false
             }
+            Log.d(TAG, "Setting user data")
             userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
             resetAlarms()
-        })
+        }
+
+        locationServSwitch.setOnClickListener ()
+        {
+            // Responds to switch being checked/unchecked
+            if (locationServSwitch.isChecked) {
+                locationServSwitch.text = getString(R.string.yes)
+                userData?.locationServices = true
+            } else {
+                locationServSwitch.text = getString(R.string.no)
+                userData?.locationServices = false
+            }
+            Log.d(TAG, "Setting user data")
+            userData?.let { Firebase.firestore.collection("Users").document(user!!.uid).set(it, SetOptions.merge()) }
+            // No need to call any functions, as onResume() will update the necessary RecyclerViews
+        }
 
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val startNotifSwitch: SwitchMaterial = binding.startNotifSwitch
+        val endNotifSwitch: SwitchMaterial = binding.endNotifSwitch
+        val locationServSwitch: SwitchMaterial = binding.locationServSwitch
+        Log.d(TAG, "User Data: ${userData}")
+
+        if (userData?.startNotifications != null && userData!!.startNotifications) {
+            startNotifSwitch.isChecked = true
+            startNotifSwitch.text = getString(R.string.yes)
+        }
+        if (userData?.endNotifications != null && userData!!.endNotifications) {
+            endNotifSwitch.isChecked = true
+            endNotifSwitch.text = getString(R.string.yes)
+        }
+        if (userData?.locationServices != null && userData!!.locationServices) {
+            locationServSwitch.isChecked = true
+            locationServSwitch.text = getString(R.string.yes)
+        }
     }
 
     override fun onDestroyView() {

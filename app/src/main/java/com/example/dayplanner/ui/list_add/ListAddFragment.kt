@@ -1,36 +1,41 @@
 package com.example.dayplanner.ui.list_add
 
+// Google maps
+
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.CompoundButton
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import com.example.dayplanner.ui.list.ListFragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
+import com.example.dayplanner.MainActivity.Companion.location
+import com.example.dayplanner.MapsActivity
 import com.example.dayplanner.R
 import com.example.dayplanner.TAG
 import com.example.dayplanner.background.UserData
-import com.example.dayplanner.databinding.FragmentListAddBinding
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
+import com.example.dayplanner.databinding.FragmentListAddBinding
+import com.example.dayplanner.userData
+import com.google.android.gms.maps.MapView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
+
+//import com.example.dayplanner.ui.list_add.WorkAroundMapFragment
+//import com.google.android.gms.maps.OnMapReadyCallback
 
 class ListAddFragment() : Fragment() {
 
@@ -39,6 +44,7 @@ class ListAddFragment() : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private var mMap: MapView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,6 +96,22 @@ class ListAddFragment() : Fragment() {
             }
         })
 
+        // Hide the map and location if location services are turned off.
+        if (userData != null) {
+            if (userData!!.locationServices) {
+                binding.evtLocation.visibility = View.VISIBLE
+                binding.evtLocationLink.visibility = View.VISIBLE
+            } else {
+                binding.evtLocation.visibility = View.GONE
+                binding.evtLocationLink.visibility = View.GONE
+            }
+        }
+
+        binding.evtLocationLink.setOnClickListener() {
+            // TODO: Navigate to map fragment
+            val intent = Intent(activity, MapsActivity::class.java)
+            startActivity(intent)
+        }
 
         val button = binding.listAddSubmit
         button.setOnClickListener() {
@@ -106,7 +128,7 @@ class ListAddFragment() : Fragment() {
             }
             // TODO: Add recurring events
 //            val recurring = binding.switchRecurring.isChecked.toString()
-            val location = binding.evtLocation.text.toString()
+            val evtLocation = binding.evtLocation.text.toString()
 
             var isValidEvent = true
 
@@ -159,7 +181,7 @@ class ListAddFragment() : Fragment() {
             if (isValidEvent) {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
-                val event: Event = Event(startTime, duration, title) // title is already title.toString()
+                val event: Event = Event(startTime, duration, title, evtLocation) // title is already title.toString()
                 eventList.add(event)
 
                 val user = Firebase.auth.currentUser
@@ -190,14 +212,22 @@ class ListAddFragment() : Fragment() {
             // the deletion
 //            eventList.removeAt(listAdapterPosition)
             if (event.startTime != null) {
-                binding.evtStartTime.text =
-                    DateFormat.getTimeInstance(DateFormat.SHORT).format(event.startTime)
+                binding.evtStartTime.setText(DateFormat.getTimeInstance(DateFormat.SHORT)
+                    .format(event.startTime))
+                binding.switchStartTime.isChecked = true
             }
             binding.evtTitle.setText(event.eventName)
             binding.evtDuration.setText((event.duration / 60000).toString())
+            binding.evtLocation.setText(event.location)
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Location is companion object
+        binding.evtLocation.setText(location)
+        location = "" // Do this because it could autofill the next time list_add is open
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

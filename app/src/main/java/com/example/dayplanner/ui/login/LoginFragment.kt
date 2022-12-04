@@ -76,7 +76,6 @@ class LoginFragment : Fragment() {
                     } else {
                         Log.d(TAG, "User does not exist, adding user")
                         db.collection("Users").document("${user?.uid}").set(User(), SetOptions.merge())
-                        userData = User()
                     }
                 }
                 .addOnFailureListener { exception ->

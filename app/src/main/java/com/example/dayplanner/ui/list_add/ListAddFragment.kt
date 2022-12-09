@@ -15,16 +15,14 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.dayplanner.*
+import com.example.dayplanner.MainActivity.Companion.context
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.MainActivity.Companion.location
-import com.example.dayplanner.MapsActivity
-import com.example.dayplanner.R
-import com.example.dayplanner.TAG
 import com.example.dayplanner.background.UserData
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
-import com.example.dayplanner.userData
 import com.google.android.gms.maps.MapView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.ktx.auth
@@ -45,6 +43,7 @@ class ListAddFragment() : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private var mMap: MapView? = null
+    private var showDialogPossible = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,13 +71,14 @@ class ListAddFragment() : Fragment() {
                 val calendar: Calendar = Calendar.getInstance()
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 calendar.set(Calendar.MINUTE, minute)
-                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.SECOND, 0) // Not interested in seconds
 
                 startTime = calendar.time
                 timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime!!)
             }
 
         // Populate with default values from an event if edit is pressed
+        // This changes the check state of the switch so it is called first
         if (listAdapterPosition != -1) {
             setup(listAdapterPosition)
             // DO NOT reset the listAdapterPosition yet, as navigating back
@@ -92,13 +92,18 @@ class ListAddFragment() : Fragment() {
             // Responds to switch being checked/unchecked
             if (isChecked) {
                 switchStartTime.text = "Yes"
-                val calendar = Calendar.getInstance()
-                val timePicker: TimePickerDialog = TimePickerDialog (context,
-                    timePickerListener(),
-                    calendar.get(Calendar.HOUR_OF_DAY),
-                    calendar.get(Calendar.MINUTE),
-                    false)
-                timePicker.show()
+                // showDialogPossible is to prevent accidental dialog popups on resume
+                if (showDialogPossible) {
+                    val calendar = Calendar.getInstance()
+                    val timePicker: TimePickerDialog = TimePickerDialog(
+                        context,
+                        timePickerListener(),
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
+                        false
+                    )
+                    timePicker.show()
+                }
                 timeTextView.visibility = View.VISIBLE
             } else {
                 switchStartTime.text = "No"
@@ -207,6 +212,15 @@ class ListAddFragment() : Fragment() {
                 val event: Event = Event(startTime, duration, title, evtLocation) // title is already title.toString()
                 eventList.add(event)
 
+                // Clear local cache of fields, can be blocking
+                context?.deleteSharedPreferences("ListAdd");
+                // Also clear every field
+                binding.evtTitle.setText("")
+                binding.evtDuration.setText("")
+                binding.switchStartTime.text = "No"
+                binding.evtStartTime.text = "00:00 AM"
+                binding.evtLocation.setText("")
+
                 val user = Firebase.auth.currentUser
                 if (user != null) {
                     Firebase.firestore.collection("Users/${user.uid}/events").add(event)
@@ -230,8 +244,8 @@ class ListAddFragment() : Fragment() {
             if (event.startTime != null) {
                 binding.evtStartTime.text = DateFormat.getTimeInstance(DateFormat.SHORT)
                     .format(event.startTime)
-                binding.switchStartTime.isChecked = true
                 binding.switchStartTime.text = "Yes"
+                binding.switchStartTime.isChecked = true
                 binding.evtStartTime.visibility = View.VISIBLE
             }
             binding.evtTitle.setText(event.eventName)
@@ -240,14 +254,41 @@ class ListAddFragment() : Fragment() {
         }
     }
 
-    // TODO: Override fun onPause / onStop to save form data when navigating to Map fragment
+    // TODO: Handle full storage
+    override fun onStop() {
+        super.onStop()
+        val sharedPrefs = context?.getSharedPreferences("ListAdd", Context.MODE_PRIVATE)
+        sharedPrefs?.edit()?.putString("evtTitle", binding.evtTitle.text.toString())?.apply()
+        sharedPrefs?.edit()?.putString("evtDuration", binding.evtDuration.text.toString())?.apply() // Numerical string
+        sharedPrefs?.edit()?.putString("switchStartTime", binding.switchStartTime.text.toString())?.apply() // "Yes" or "No"
+        sharedPrefs?.edit()?.putString("evtStartTime", binding.evtStartTime.text.toString())?.apply() // Start time from button
+        sharedPrefs?.edit()?.putString("evtLocation", binding.evtLocation.text.toString())?.apply()
+    }
 
+    override fun onStart() {
+        super.onStart()
+        val sharedPrefs = context?.getSharedPreferences("ListAdd", Context.MODE_PRIVATE)
+        binding.evtTitle.setText(sharedPrefs?.getString("evtTitle", ""))
+        binding.evtDuration.setText(sharedPrefs?.getString("evtDuration", ""))
+        val startSwitchString = sharedPrefs?.getString("switchStartTime", "")
+        if (startSwitchString == "Yes") {
+            binding.switchStartTime.text = startSwitchString
+            binding.switchStartTime.isChecked = true
+            binding.evtStartTime.text = sharedPrefs.getString("evtStartTime", "")
+            binding.evtStartTime.visibility = View.VISIBLE
+        } else {
+            // This else additionally handles the case where the string is empty
+            binding.switchStartTime.text = "No"
+        }
+        showDialogPossible = true // Does not show dialog, just makes it possible later
 
-    override fun onResume() {
-        super.onResume()
-        // Location is companion object
-        binding.evtLocation.setText(location)
-        location = "" // Do this because it could autofill the next time list_add is open
+        // Handle information from map activity
+        if (location != "") { // Location is companion object
+            binding.evtLocation.setText(location)
+            location = "" // Do this because it could autofill the next time list_add is opened
+        } else {
+            binding.evtLocation.setText(sharedPrefs?.getString("evtLocation", ""))
+        }
     }
     override fun onDestroyView() {
         super.onDestroyView()

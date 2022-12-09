@@ -9,22 +9,16 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.dayplanner.*
-import com.example.dayplanner.MainActivity.Companion.context
 import com.example.dayplanner.data.Event
-import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.random.Random.Default.nextInt
+import kotlin.random.Random
 
-class UserData {
+class Alarms {
     companion object {
-        val alarmManager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager: AlarmManager = MainActivity.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         private val alarmList: ArrayList<Intent> = ArrayList()
 
         //Most of the inspiration for this comes from
@@ -36,7 +30,7 @@ class UserData {
                 val _eventStart: Boolean? = p1?.extras?.getBoolean("eventStart")
                 val _id: Int? = p1?.extras?.getInt("id")
                 val eventStart: Boolean = if (_eventStart != null) _eventStart else true
-                val id: Int = if (_id != null) _id else nextInt(0, Int.MAX_VALUE - 1)
+                val id: Int = if (_id != null) _id else Random.nextInt(0, Int.MAX_VALUE - 1)
 
                 val tapIntent: Intent =  Intent (p0, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -77,59 +71,6 @@ class UserData {
             }
         }
 
-        private fun getEvents(uid: String) {
-            val db = Firebase.firestore
-            Log.d(TAG, "Getting already created events from Firestore")
-            db.collection("Users/${uid}/events").get()
-                .addOnSuccessListener { documents ->
-                    Log.d(TAG, "Document request succeeded")
-                    val calendar: Calendar = Calendar.getInstance()
-                    calendar.set(Calendar.HOUR_OF_DAY, 0)
-                    calendar.set(Calendar.MINUTE, 0)
-                    calendar.set(Calendar.SECOND, 0)
-                    val currDate: Date = calendar.time
-
-                    for (document in documents) {
-                        val event: Event = document.toObject(Event::class.java)
-                        //Make sure event is today and not, say, a week ago
-                        if (event.startTime == null || event.startTime.after(currDate)) {
-                            //Needed for signin, because it uploads all current events before getting from db
-                            if (!eventList.contains(event))
-                                eventList.add(event)
-                        }
-//                    else //Delete it if it isn't today
-//                        db.collection("Users/${user}/events").document(document.id).delete()
-                        DB_PULL_COMPLETED = true
-                    }
-                    Log.d(TAG, "Getting user")
-                    //Needs to be called in order so certain functions work
-                    getUser(uid)
-                }
-                .addOnFailureListener { exception ->
-                    Log.w(TAG, "Error getting documents: ", exception)
-                }
-        }
-
-        private fun getUser(uid: String) {
-            val db = Firebase.firestore
-            Log.d(TAG, "Getting user settings from Firestore")
-            db.collection("Users").document(uid).get()
-                .addOnSuccessListener { user ->
-                    Log.d(TAG, "User data pulled")
-                    if (user.exists()) {
-                        userData = user.toObject(User::class.java)
-                        Log.d(TAG, "User data: ${userData}")
-                    } else {
-                        userData = User()
-                    }
-                    //Needs to be called in order so this function can work
-                    setAllAlarms()
-                }
-                .addOnFailureListener { exception ->
-                    Log.w(TAG, "Error getting user: ", exception)
-                }
-        }
-
         //Must include old event to update event! Otherwise, this function has no way of knowing for sure it's the same event
         fun setAlarm(event: Event, oldEvent: Event? = null) {
             if (event.startTime != null && userData != null) {
@@ -137,7 +78,7 @@ class UserData {
                     if (userData!!.startNotifications) {
                         val eventTime = event.startTime.time
                         if (Date(eventTime).after(Date())) {
-                            val id = nextInt(0, Int.MAX_VALUE - 1)
+                            val id = Random.nextInt(0, Int.MAX_VALUE - 1)
 
                             val alarmIntent = Intent(LOCAL_NOTIFICATION)
                                 .putExtra("id", id)
@@ -146,7 +87,7 @@ class UserData {
                                 .putExtra("startTime", eventTime)
 
                             val pendingIntent = PendingIntent.getBroadcast(
-                                context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+                                MainActivity.context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
 
                             alarmManager.setExactAndAllowWhileIdle(
                                 AlarmManager.RTC_WAKEUP, eventTime, pendingIntent)
@@ -165,7 +106,7 @@ class UserData {
                     if (userData!!.endNotifications) {
                         val eventTime = event.startTime.time + event.duration
                         if (Date(eventTime).after(Date())) {
-                            val id = nextInt(0, Int.MAX_VALUE - 1)
+                            val id = Random.nextInt(0, Int.MAX_VALUE - 1)
 
                             val alarmIntent = Intent(LOCAL_NOTIFICATION)
                                 .putExtra("id", id)
@@ -174,7 +115,7 @@ class UserData {
                                 .putExtra("startTime", eventTime)
 
                             val pendingIntent = PendingIntent.getBroadcast(
-                                context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+                                MainActivity.context, id, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
 
                             alarmManager.setExactAndAllowWhileIdle(
                                 AlarmManager.RTC_WAKEUP, eventTime, pendingIntent)
@@ -216,7 +157,7 @@ class UserData {
                     if (alarmTime == eventStart || alarmTime == eventEnd) {
                         val id = intent.getIntExtra("id", 0)
                         val pendingIntent = PendingIntent.getBroadcast(
-                            context, id, intent,
+                            MainActivity.context, id, intent,
                             PendingIntent.FLAG_IMMUTABLE
                         )
                         alarmManager.cancel(pendingIntent)
@@ -239,7 +180,7 @@ class UserData {
                 for (intent in alarmList) {
                     if (alarmTime == intent.getLongExtra("startTime", 0)) {
                         val id = intent.getIntExtra("id", 0)
-                        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                        val pendingIntent = PendingIntent.getBroadcast(MainActivity.context, id, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                         alarmManager.cancel(pendingIntent)
                         deletedAlarms.add(intent)
                     }
@@ -250,7 +191,7 @@ class UserData {
             }
         }
 
-        private fun setAllAlarms() {
+        fun setAllAlarms() {
             Log.d(TAG, "Setting all alarms")
             for (event in eventList)
             {
@@ -259,12 +200,13 @@ class UserData {
             }
         }
 
-        private fun clearAllAlarms() {
+        fun clearAllAlarms() {
             Log.d(TAG, "Clearing all alarms")
             for (intent in alarmList)
             {
                 val id = intent.getIntExtra("id", 0)
-                val pendingIntent = PendingIntent.getBroadcast(context, id, intent,
+                val pendingIntent = PendingIntent.getBroadcast(
+                    MainActivity.context, id, intent,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
                 alarmManager.cancel(pendingIntent)
             }
@@ -294,35 +236,5 @@ class UserData {
             clearAllAlarms()
             setAllAlarms()
         }
-
-        fun login() {
-            val db = Firebase.firestore
-            val user = FirebaseAuth.getInstance().currentUser
-
-            if (user != null) {
-                Log.d(TAG, "Uploading current events to database")
-                for (event in eventList) {
-                    db.collection("Users/${user.uid}/events").add(event)
-                        .addOnSuccessListener { Log.d(TAG, "Event successfully written!") }
-                        .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
-                }
-                Log.d(TAG, "Getting events from database")
-                getEvents(user.uid)
-                DB_PULL_COMPLETED = true
-            }
-        }
-
-        fun logout() {
-            clearAllAlarms()
-            eventList.clear()
-            DB_PULL_COMPLETED = false
-            userData = null
-            MainActivity.location = null
-        }
-
-        fun startup (uid: String) {
-            getEvents(uid)
-        }
     }
 }
-

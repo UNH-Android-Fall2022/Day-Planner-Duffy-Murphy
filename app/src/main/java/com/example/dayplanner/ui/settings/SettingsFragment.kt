@@ -11,9 +11,9 @@ import android.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
+import com.example.dayplanner.background.Alarms.Companion.resetAlarms
+import com.example.dayplanner.background.Session.Companion.logout
 import com.example.dayplanner.databinding.FragmentSettingsBinding
-import com.example.dayplanner.background.UserData.Companion.logout
-import com.example.dayplanner.background.UserData.Companion.resetAlarms
 import com.example.dayplanner.data.User
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.switchmaterial.SwitchMaterial

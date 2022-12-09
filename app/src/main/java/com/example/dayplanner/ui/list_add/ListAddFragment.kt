@@ -75,7 +75,7 @@ class ListAddFragment() : Fragment() {
                 calendar.set(Calendar.SECOND, 0)
 
                 startTime = calendar.time
-                timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime)
+                timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime!!)
             }
 
         // Populate with default values from an event if edit is pressed
@@ -92,10 +92,11 @@ class ListAddFragment() : Fragment() {
             // Responds to switch being checked/unchecked
             if (isChecked) {
                 switchStartTime.text = "Yes"
+                val calendar = Calendar.getInstance()
                 val timePicker: TimePickerDialog = TimePickerDialog (context,
                     timePickerListener(),
-                    Calendar.HOUR_OF_DAY,
-                    Calendar.MINUTE,
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
                     false)
                 timePicker.show()
                 timeTextView.visibility = View.VISIBLE
@@ -106,11 +107,13 @@ class ListAddFragment() : Fragment() {
         })
 
         binding.evtStartTime.setOnClickListener() {
+            // Get a fresh calendar instance
+            val calendar = Calendar.getInstance()
             val timePicker: TimePickerDialog = TimePickerDialog(
                 context,
                 timePickerListener(),
-                Calendar.HOUR_OF_DAY,
-                Calendar.MINUTE,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
                 false
             )
             timePicker.show()
@@ -236,6 +239,9 @@ class ListAddFragment() : Fragment() {
             binding.evtLocation.setText(event.location)
         }
     }
+
+    // TODO: Override fun onPause / onStop to save form data when navigating to Map fragment
+
 
     override fun onResume() {
         super.onResume()

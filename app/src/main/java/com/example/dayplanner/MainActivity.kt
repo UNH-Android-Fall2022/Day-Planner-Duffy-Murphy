@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_list, R.id.navigation_planner, R.id.navigation_settings, R.id.navigation_login
+                R.id.navigation_list, R.id.navigation_planner, R.id.navigation_settings, R.id.navigation_login, R.id.navigation_list_add
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         createNotificationChannel()
         notificationManager.cancelAll()
+
 
         val timeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
         Log.d(TAG, "Current time and day: ${timeFormat.format(Date())}")

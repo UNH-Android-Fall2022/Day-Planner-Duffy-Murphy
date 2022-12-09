@@ -12,6 +12,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.dayplanner.databinding.ListAddMapBinding
@@ -70,7 +71,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker at last known location (It's not that important) and move the camera
-
         getCurrentLocation()
 
         // This listener was adapted from
@@ -86,6 +86,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             var address: String? = null
             if (!addresses.isNullOrEmpty()) {
                 address = addresses.get(0)?.getAddressLine(0) //0 to obtain first possible address
+            } else {
+                Toast.makeText(this, "Invalid marker location: could not find an address.", Toast.LENGTH_LONG).show()
             }
 
             if (address != null) {
@@ -135,11 +137,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Also move the camera
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(point))
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15F))
+            } else {
+                Toast.makeText(this, "Invalid search: could not find an address.", Toast.LENGTH_LONG).show()
             }
         }
 
     }
 
+    // Logic from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun getCurrentLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
@@ -181,12 +186,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
-    // From https://www.youtube.com/watch?v=mwzKYIB9cQs
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun checkPermissions() : Boolean {
         return (ActivityCompat.checkSelfPermission(this,
             android.Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -196,6 +202,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 == PackageManager.PERMISSION_GRANTED)
     }
 
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun requestPermission() {
         ActivityCompat.requestPermissions(this, arrayOf(
             android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -204,6 +211,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -212,7 +220,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
             if (grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
-                Log.d("my special tag", "Granted")
                 getCurrentLocation()
             } else {
                 Log.d("my special tag", "Denied. TODO: do something if denied.")

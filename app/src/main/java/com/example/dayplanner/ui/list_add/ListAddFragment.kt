@@ -78,6 +78,15 @@ class ListAddFragment() : Fragment() {
                 timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime)
             }
 
+        // Populate with default values from an event if edit is pressed
+        if (listAdapterPosition != -1) {
+            setup(listAdapterPosition)
+            // DO NOT reset the listAdapterPosition yet, as navigating back
+            // to the list fragment needs to update the recyclerView
+//            listAdapterPosition = -1 // Reset
+        }
+
+        // TimePickerDialog event listener. Copied for when the user clicks on the time.
         val switchStartTime: SwitchMaterial = binding.switchStartTime
         switchStartTime.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
             // Responds to switch being checked/unchecked
@@ -95,6 +104,17 @@ class ListAddFragment() : Fragment() {
                 timeTextView.visibility = View.GONE
             }
         })
+
+        binding.evtStartTime.setOnClickListener() {
+            val timePicker: TimePickerDialog = TimePickerDialog(
+                context,
+                timePickerListener(),
+                Calendar.HOUR_OF_DAY,
+                Calendar.MINUTE,
+                false
+            )
+            timePicker.show()
+        }
 
         // Hide the map and location if location services are turned off.
         if (userData != null) {
@@ -194,17 +214,10 @@ class ListAddFragment() : Fragment() {
             }
         }
 
-        // Populate with default values from an event if edit is pressed
-        if (listAdapterPosition != -1) {
-            setup(listAdapterPosition)
-            // DO NOT reset the listAdapterPosition yet, as navigating back
-            // to the list fragment needs to update the recyclerView
-//            listAdapterPosition = -1 // Reset
-        }
-
         return root
     }
 
+    // We try to call this function before the onCheckedChangeListener
     private fun setup(eventListPosition: Int) {
         val event = eventList[eventListPosition]
         if (event != null) {
@@ -212,9 +225,11 @@ class ListAddFragment() : Fragment() {
             // the deletion
 //            eventList.removeAt(listAdapterPosition)
             if (event.startTime != null) {
-                binding.evtStartTime.setText(DateFormat.getTimeInstance(DateFormat.SHORT)
-                    .format(event.startTime))
+                binding.evtStartTime.text = DateFormat.getTimeInstance(DateFormat.SHORT)
+                    .format(event.startTime)
                 binding.switchStartTime.isChecked = true
+                binding.switchStartTime.text = "Yes"
+                binding.evtStartTime.visibility = View.VISIBLE
             }
             binding.evtTitle.setText(event.eventName)
             binding.evtDuration.setText((event.duration / 60000).toString())

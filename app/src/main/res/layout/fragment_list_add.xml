@@ -85,13 +85,13 @@
                 android:textSize="20sp"
                 android:text="@string/switch_default_text" />
 
-            <TextView
+            <Button
                 android:id="@+id/evt_start_time"
-                android:visibility="gone"
+                android:backgroundTint="@color/app_blue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/list_add_spacing"
-                android:textSize="@dimen/list_add_text_size"
+                android:textSize="19dp"
                 android:text="@string/default_time" />
         </LinearLayout>
 

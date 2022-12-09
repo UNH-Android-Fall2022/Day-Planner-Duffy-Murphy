@@ -7,7 +7,8 @@ data class Event(
     val startTime: Date? = null,
     val duration: Int = 900000,
     val eventName: String = "",
-    val location: String = ""
+    val location: String = "",
+    val recurring: Int = 0
 )
 
 val eventList: ArrayList<Event> = ArrayList()

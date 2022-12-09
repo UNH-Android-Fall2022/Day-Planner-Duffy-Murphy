@@ -15,36 +15,61 @@ import java.util.*
 import com.example.dayplanner.background.Alarms
 import com.example.dayplanner.background.Alarms.Companion.clearAllAlarms
 import com.example.dayplanner.background.Alarms.Companion.setAllAlarms
+import com.google.firebase.firestore.SetOptions
 
 class Session {
     companion object {
         private fun getEvents(uid: String) {
             val db = Firebase.firestore
+
             Log.d(TAG, "Getting already created events from Firestore")
             db.collection("Users/${uid}/events").get()
                 .addOnSuccessListener { documents ->
                     Log.d(TAG, "Document request succeeded")
+
                     val calendar: Calendar = Calendar.getInstance()
                     calendar.set(Calendar.HOUR_OF_DAY, 0)
                     calendar.set(Calendar.MINUTE, 0)
                     calendar.set(Calendar.SECOND, 0)
-                    val currDate: Date = calendar.time
+                    calendar.set(Calendar.MILLISECOND, 0)
+                    val currDay: Date = calendar.time
 
-                    for (document in documents) {
-                        val event: Event = document.toObject(Event::class.java)
-                        //Make sure event is today and not, say, a week ago
-                        if (event.startTime == null || event.startTime.after(currDate)) {
-                            //Needed for signin, because it uploads all current events before getting from db
-                            if (!eventList.contains(event))
-                                eventList.add(event)
+                    val eventsLastCleared = userData?.eventsLastCleared
+
+                    if (eventsLastCleared != null && currDay.before(eventsLastCleared)) {
+                        for (document in documents) {
+                            val event: Event = document.toObject(Event::class.java)
+                            if (event.recurring == 0) { //TODO: Implement recurring events
+                                //Needed for signin, because it uploads all current events before getting from db
+                                if (!eventList.contains(event))
+                                    eventList.add(event)
+                            }
                         }
-//                    else //Delete it if it isn't today
-//                        db.collection("Users/${user}/events").document(document.id).delete()
                         DB_PULL_COMPLETED = true
+
+                        Log.d(TAG, "Setting alarms")
+                        //Needs to be called in order so this function can work
+                        setAllAlarms()
+                    }else {
+                        Log.d(TAG, "Events last cleared before today began. Clearing all events")
+                        for (document in documents) {
+                            val event: Event = document.toObject(Event::class.java)
+                            if (event.recurring == 0) {
+                                db.collection("Users/${uid}/events")
+                                    .document(document.id)
+                                    .delete()
+                            }
+                        }
+                        val user = FirebaseAuth.getInstance().currentUser
+                        userData?.eventsLastCleared = Date()
+                        userData?.let {
+                            Firebase.firestore.collection("Users")
+                                .document(user!!.uid)
+                                .set(it, SetOptions.merge())
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "Successfully updated clear date") }
+                        }
                     }
-                    Log.d(TAG, "Getting user")
-                    //Needs to be called in order so this function can work
-                    setAllAlarms()
                 }
                 .addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting documents: ", exception)
@@ -63,6 +88,8 @@ class Session {
                     } else {
                         userData = User()
                     }
+
+                    Log.d(TAG, "Getting events from database")
                     //Needs to be called in order so certain functions work
                     getEvents(uid)
                 }
@@ -82,7 +109,7 @@ class Session {
                         .addOnSuccessListener { Log.d(TAG, "Event successfully written!") }
                         .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
                 }
-                Log.d(TAG, "Getting events from database")
+                Log.d(TAG, "Getting user from database")
                 getUser(user.uid)
                 DB_PULL_COMPLETED = true
             }

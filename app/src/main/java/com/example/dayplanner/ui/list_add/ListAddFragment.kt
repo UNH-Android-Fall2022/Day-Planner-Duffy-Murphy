@@ -1,7 +1,5 @@
 package com.example.dayplanner.ui.list_add
 
-// Google maps
-
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -12,14 +10,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
-import com.example.dayplanner.MainActivity.Companion.context
+import com.example.dayplanner.MainActivity.Companion.cameFromMapsActivity
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.MainActivity.Companion.location
-import com.example.dayplanner.background.UserData
+import com.example.dayplanner.background.Alarms
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.FragmentListAddBinding
@@ -29,6 +26,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -43,7 +41,8 @@ class ListAddFragment() : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private var mMap: MapView? = null
-    private var showDialogPossible = false
+    // This var is set sometimes during onStart() so it needs bigger scope
+    private var startTime: Date? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,16 +52,25 @@ class ListAddFragment() : Fragment() {
         _binding = FragmentListAddBinding.inflate(inflater, container, false)
         val root: View = binding.root
         val switchRecurring: SwitchMaterial = binding.switchRecurring
-        switchRecurring.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+
+//        // Populate with default values from an event if edit is pressed
+//        // This changes the check state of the switch so it is called first
+//        if (listAdapterPosition != -1) {
+//            setup(listAdapterPosition)
+//            // DO NOT reset the listAdapterPosition yet, as navigating back
+//            // to the list fragment needs to update the recyclerView
+////            listAdapterPosition = -1 // Reset
+//        }
+
+        switchRecurring.setOnClickListener {
             // Responds to switch being checked/unchecked
-            if (isChecked) {
+            if (switchRecurring.isChecked) {
                 switchRecurring.text = "Yes"
             } else {
                 switchRecurring.text = "No"
             }
-        })
+        }
 
-        var startTime: Date? = null
         val timeTextView = binding.evtStartTime
         // This listener is used below with the switch to allow setting the time
         // Adapted from https://stackoverflow.com/questions/55090855/kotlin-problem-timepickerdialog-ontimesetlistener-in-class-output-2-values-lo
@@ -77,39 +85,28 @@ class ListAddFragment() : Fragment() {
                 timeTextView.text = DateFormat.getTimeInstance(DateFormat.SHORT).format(startTime!!)
             }
 
-        // Populate with default values from an event if edit is pressed
-        // This changes the check state of the switch so it is called first
-        if (listAdapterPosition != -1) {
-            setup(listAdapterPosition)
-            // DO NOT reset the listAdapterPosition yet, as navigating back
-            // to the list fragment needs to update the recyclerView
-//            listAdapterPosition = -1 // Reset
-        }
-
         // TimePickerDialog event listener. Copied for when the user clicks on the time.
         val switchStartTime: SwitchMaterial = binding.switchStartTime
-        switchStartTime.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        switchStartTime.setOnClickListener {
             // Responds to switch being checked/unchecked
-            if (isChecked) {
+            if (switchStartTime.isChecked) {
                 switchStartTime.text = "Yes"
                 // showDialogPossible is to prevent accidental dialog popups on resume
-                if (showDialogPossible) {
-                    val calendar = Calendar.getInstance()
-                    val timePicker: TimePickerDialog = TimePickerDialog(
-                        context,
-                        timePickerListener(),
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE),
-                        false
-                    )
-                    timePicker.show()
-                }
+                val calendar = Calendar.getInstance()
+                val timePicker: TimePickerDialog = TimePickerDialog(
+                    context,
+                    timePickerListener(),
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    false
+                )
+                timePicker.show()
                 timeTextView.visibility = View.VISIBLE
             } else {
                 switchStartTime.text = "No"
                 timeTextView.visibility = View.GONE
             }
-        })
+        }
 
         binding.evtStartTime.setOnClickListener() {
             // Get a fresh calendar instance
@@ -154,8 +151,12 @@ class ListAddFragment() : Fragment() {
             if (!binding.switchStartTime.isChecked) {
                 startTime = null
             }
-            // TODO: Add recurring events
-//            val recurring = binding.switchRecurring.isChecked.toString()
+
+            var recurring = 0
+            if (binding.switchRecurring.isChecked) {
+                recurring = 1
+            }
+
             val evtLocation = binding.evtLocation.text.toString()
 
             var isValidEvent = true
@@ -209,28 +210,21 @@ class ListAddFragment() : Fragment() {
             if (isValidEvent) {
                 val action = ListAddFragmentDirections.actionNavigationListAddToNavigationList()
                 findNavController().navigate(action)
-                val event: Event = Event(startTime, duration, title, evtLocation) // title is already title.toString()
+                val event: Event = Event(startTime, duration, title, evtLocation, recurring) // title is already title.toString()
                 eventList.add(event)
 
                 // Clear local cache of fields, can be blocking
                 context?.deleteSharedPreferences("ListAdd");
-                // Also clear every field
-                binding.evtTitle.setText("")
-                binding.evtDuration.setText("")
-                binding.switchStartTime.text = "No"
-                binding.evtStartTime.text = "00:00 AM"
-                binding.evtLocation.setText("")
 
                 val user = Firebase.auth.currentUser
                 if (user != null) {
                     Firebase.firestore.collection("Users/${user.uid}/events").add(event)
                         .addOnSuccessListener { Log.d(TAG, "Event successfully written!") }
                         .addOnFailureListener { e -> Log.w(TAG, "Error writing document: ", e) }
-                    UserData.setAlarm(event)
+                    Alarms.setAlarm(event)
                 }
             }
         }
-
         return root
     }
 
@@ -244,9 +238,14 @@ class ListAddFragment() : Fragment() {
             if (event.startTime != null) {
                 binding.evtStartTime.text = DateFormat.getTimeInstance(DateFormat.SHORT)
                     .format(event.startTime)
+                startTime = event.startTime
                 binding.switchStartTime.text = "Yes"
                 binding.switchStartTime.isChecked = true
                 binding.evtStartTime.visibility = View.VISIBLE
+            }
+            if (event.recurring != 0) {
+                binding.switchRecurring.text = "Yes"
+                binding.switchRecurring.isChecked = true
             }
             binding.evtTitle.setText(event.eventName)
             binding.evtDuration.setText((event.duration / 60000).toString())
@@ -262,34 +261,60 @@ class ListAddFragment() : Fragment() {
         sharedPrefs?.edit()?.putString("evtDuration", binding.evtDuration.text.toString())?.apply() // Numerical string
         sharedPrefs?.edit()?.putString("switchStartTime", binding.switchStartTime.text.toString())?.apply() // "Yes" or "No"
         sharedPrefs?.edit()?.putString("evtStartTime", binding.evtStartTime.text.toString())?.apply() // Start time from button
+        sharedPrefs?.edit()?.putString("switchRecurring", binding.switchRecurring.text.toString())?.apply() // "Yes" or "No"
         sharedPrefs?.edit()?.putString("evtLocation", binding.evtLocation.text.toString())?.apply()
     }
 
     override fun onStart() {
         super.onStart()
-        val sharedPrefs = context?.getSharedPreferences("ListAdd", Context.MODE_PRIVATE)
-        binding.evtTitle.setText(sharedPrefs?.getString("evtTitle", ""))
-        binding.evtDuration.setText(sharedPrefs?.getString("evtDuration", ""))
-        val startSwitchString = sharedPrefs?.getString("switchStartTime", "")
-        if (startSwitchString == "Yes") {
-            binding.switchStartTime.text = startSwitchString
-            binding.switchStartTime.isChecked = true
-            binding.evtStartTime.text = sharedPrefs.getString("evtStartTime", "")
-            binding.evtStartTime.visibility = View.VISIBLE
-        } else {
-            // This else additionally handles the case where the string is empty
-            binding.switchStartTime.text = "No"
-        }
-        showDialogPossible = true // Does not show dialog, just makes it possible later
+        // Populate with existing values from an event when EDIT is pressed
+        if (listAdapterPosition != -1) {
+            setup(listAdapterPosition)
+            // DO NOT reset the listAdapterPosition yet, as navigating back
+            // to the list fragment needs to update the recyclerView
+        } else if (cameFromMapsActivity) {
+            // Load values from cache when navigating back from the MapsActivity
+            val sharedPrefs = context?.getSharedPreferences("ListAdd", Context.MODE_PRIVATE)
+            binding.evtTitle.setText(sharedPrefs?.getString("evtTitle", ""))
+            binding.evtDuration.setText(sharedPrefs?.getString("evtDuration", ""))
+            val startSwitchString = sharedPrefs?.getString("switchStartTime", "")
+            if (startSwitchString == "Yes") {
+                binding.switchStartTime.text = startSwitchString
+                binding.switchStartTime.isChecked = true
+                binding.evtStartTime.text = sharedPrefs.getString("evtStartTime", "")
 
-        // Handle information from map activity
-        if (location != "") { // Location is companion object
-            binding.evtLocation.setText(location)
-            location = "" // Do this because it could autofill the next time list_add is opened
-        } else {
-            binding.evtLocation.setText(sharedPrefs?.getString("evtLocation", ""))
+                // Get the start time as a date
+                // Adapted from https://stackoverflow.com/questions/5301226/convert-string-to-calendar-object-in-java
+                val calendar = Calendar.getInstance()
+                val sdf = SimpleDateFormat("HH:mm a", Locale.getDefault())
+                calendar.time = sdf.parse(binding.evtStartTime.text.toString())!! // all done
+                startTime = calendar.time
+
+                binding.evtStartTime.visibility = View.VISIBLE
+            } else {
+                // This else additionally handles the case where the string is empty
+                binding.switchStartTime.text = "No"
+            }
+            val recurringSwitchString = sharedPrefs?.getString("switchRecurring", "")
+            if (recurringSwitchString == "Yes") {
+                binding.switchRecurring.text = recurringSwitchString
+                binding.switchRecurring.isChecked = true
+            } else {
+                binding.switchRecurring.text = "No"
+            }
+
+            // Handle information from map activity
+            if (location != "") { // Location is companion object
+                binding.evtLocation.setText(location)
+                location = "" // Do this because it could autofill the next time list_add is opened
+            } else {
+                binding.evtLocation.setText(sharedPrefs?.getString("evtLocation", ""))
+            }
+
+            cameFromMapsActivity = false
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -301,11 +326,7 @@ class ListAddFragment() : Fragment() {
             .setTitle(title)
             .setMessage(message) // Specifying a listener allows you to take an action before dismissing the dialog.
             // The dialog is automatically dismissed when a dialog button is clicked.
-            .setPositiveButton("Confirm",
-                DialogInterface.OnClickListener { dialog, which ->
-                    // Continue with delete operation
-                    binding.evtTitle.setSelection(0)
-                }) // A null listener allows the button to dismiss the dialog and take no further action.
+            .setPositiveButton("Confirm", null)
             .setNegativeButton("Cancel", null)
             .setIcon(R.drawable.ic_baseline_warning_24)
             .show()

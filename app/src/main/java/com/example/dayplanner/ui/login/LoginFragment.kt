@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
-import com.example.dayplanner.background.UserData.Companion.login
+import com.example.dayplanner.background.Session.Companion.login
 import com.example.dayplanner.databinding.FragmentLoginBinding
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract

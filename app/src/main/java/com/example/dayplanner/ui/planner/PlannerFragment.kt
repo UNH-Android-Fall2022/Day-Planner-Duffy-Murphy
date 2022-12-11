@@ -70,17 +70,6 @@ class PlannerFragment : Fragment() {
                 plannerList.add(item)
         }
 
-        //Test code
-//        val testList: ArrayList<Event> = arrayListOf(
-//            Event(Date(), 60000*15, "Event 1"),
-//            Event(Date(Date().time + 60000 * 60), 60000*45, "Event 4"),
-//            Event(null, 60000*15, "Event 2"),
-//            Event(Date(), 60000*30, "Event 3"),
-//            Event(Date(Date().time + 60000 * 60*5), 60000*45, "Event 5")
-//        )
-//
-//        plannerList.addAll(testList)
-
         plannerList.sortBy { it.startTime }
 
         for(item in plannerList){

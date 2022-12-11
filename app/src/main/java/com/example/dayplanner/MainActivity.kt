@@ -1,6 +1,5 @@
 package com.example.dayplanner
 
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -13,11 +12,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.dayplanner.background.UserData
-import com.example.dayplanner.background.UserData.Companion.startup
+import com.example.dayplanner.background.Alarms
+import com.example.dayplanner.background.Session.Companion.startup
 import com.example.dayplanner.data.User
 import com.example.dayplanner.databinding.ActivityMainBinding
-import com.example.dayplanner.ui.list.ListFragmentDirections
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -25,7 +23,7 @@ import java.text.DateFormat
 import java.util.*
 
 
-val TAG = "my special tag"
+val TAG = "DayPlanner"
 val LOCAL_NOTIFICATION = "Local Notification"
 var DB_PULL_COMPLETED: Boolean = false
 var CHANNEL_ID: String = "Day Planner App Notification Channel"
@@ -42,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         var listAdapterPosition: Int = -1
         var location: String? = null
         var appWasJustStarted = true
+        var cameFromMapsActivity = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         context = this
@@ -69,12 +68,11 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         createNotificationChannel()
-        notificationManager.cancelAll()
 
 
         val timeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
         Log.d(TAG, "Current time and day: ${timeFormat.format(Date())}")
-        context.registerReceiver(UserData.Companion.NotificationAlarm, IntentFilter(LOCAL_NOTIFICATION))
+        context.registerReceiver(Alarms.NotificationAlarm, IntentFilter(LOCAL_NOTIFICATION))
         val user = Firebase.auth.currentUser
         if (user != null) {
             startup(user.uid)
@@ -84,11 +82,15 @@ class MainActivity : AppCompatActivity() {
     // Strictly for returning from Google map
     override fun onResume() {
         super.onResume()
+
+        notificationManager.cancelAll()
+
         location = this.intent.extras?.getString("loc")
         // Crude way to check if we are returning from the MapsActivity
         if (location != null) {
             val navController = findNavController(R.id.nav_host_fragment_activity_main)
             navController.navigate(R.id.navigation_list_add)
+            cameFromMapsActivity = true
         }
         this.intent.extras?.clear()
     }

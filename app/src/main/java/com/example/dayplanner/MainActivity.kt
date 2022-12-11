@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             val navController = findNavController(R.id.nav_host_fragment_activity_main)
             navController.navigate(R.id.navigation_list_add)
         }
-        this.intent.extras?.clear()
+        this.intent.removeExtra("loc")
     }
 
     private fun createNotificationChannel() {

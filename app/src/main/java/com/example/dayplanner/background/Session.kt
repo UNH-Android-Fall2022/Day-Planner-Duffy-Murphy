@@ -39,7 +39,8 @@ class Session {
                     if (eventsLastCleared != null && currDay.before(eventsLastCleared)) {
                         for (document in documents) {
                             val event: Event = document.toObject(Event::class.java)
-                            if (event.recurring == 0) { //TODO: Implement recurring events
+                            if (event.recurring == 0 || //TODO: Add more types of recurring events
+                                event.recurring == 1) {
                                 //Needed for signin, because it uploads all current events before getting from db
                                 if (!eventList.contains(event))
                                     eventList.add(event)
@@ -51,6 +52,8 @@ class Session {
                         //Needs to be called in order so this function can work
                         setAllAlarms()
                     }else {
+                        // We need to clear it in the app because Firestore's TTL feature
+                        // Can take up to 72 hours
                         Log.d(TAG, "Events last cleared before today began. Clearing all events")
                         for (document in documents) {
                             val event: Event = document.toObject(Event::class.java)

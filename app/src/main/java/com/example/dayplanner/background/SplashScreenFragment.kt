@@ -51,9 +51,9 @@ open class SplashScreenFragment : Fragment() {
                     i = (i + 1) % (num_dots + 1) // i = 0, 1, 2, or 3
                     if (DB_PULL_COMPLETED) {
                         if (appWasJustStarted) {
+                            appWasJustStarted = false
                             val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()
                             findNavController().navigate(action)
-                            appWasJustStarted = false
                         } else {
                             val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationSettings()
                             findNavController().navigate(action)

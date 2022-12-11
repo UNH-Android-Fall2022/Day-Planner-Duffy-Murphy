@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.dayplanner.databinding.FragmentListBinding
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dayplanner.MainActivity.Companion.appWasJustStarted
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
 import com.example.dayplanner.background.Alarms
 import com.example.dayplanner.data.eventList
@@ -31,6 +33,12 @@ open class ListFragment : Fragment() {
     ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        // This is the default (initial) page. Handle user sign in with splash screen
+        if (FirebaseAuth.getInstance().currentUser != null && appWasJustStarted) {
+            val action = ListFragmentDirections.actionNavigationListToNavigationSplashScreen()
+            findNavController().navigate(action)
+        }
 
         updateRecyclerView()
         val fab = binding.floatingActionButton

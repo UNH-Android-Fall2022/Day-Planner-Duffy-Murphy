@@ -80,7 +80,7 @@ class PlannerFragment : Fragment() {
                         timeFormat.format(Date(item.startTime.time + item.duration)),
                         item.eventName,
                         item.duration,
-                        item.location // TODO: This might not work
+                        item.location
                     )
                 )
             }

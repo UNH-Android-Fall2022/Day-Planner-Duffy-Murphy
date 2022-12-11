@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_list">
+    app:startDestination="@+id/navigation_splash_screen">
 
     <fragment
         android:id="@+id/navigation_list"
@@ -52,5 +52,22 @@
         <action
             android:id="@+id/action_navigation_login_to_navigation_settings"
             app:destination="@id/navigation_settings" />
+        <action
+            android:id="@+id/action_navigation_login_to_navigation_splash_screen"
+            app:destination="@id/navigation_splash_screen" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_splash_screen"
+        android:name="com.example.dayplanner.background.SplashScreenFragment"
+        android:label="Fetching data"
+        tools:layout="@layout/splash_screen" >
+        <action
+            android:id="@+id/action_navigation_splash_screen_to_navigation_settings"
+            app:destination="@id/navigation_settings" />
+        <action
+            android:id="@+id/action_navigation_splash_screen_to_navigation_list"
+            app:destination="@id/navigation_list" />
+    </fragment>
+
 </navigation>

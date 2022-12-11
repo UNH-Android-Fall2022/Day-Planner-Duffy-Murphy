@@ -12,14 +12,10 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import com.example.dayplanner.MainActivity.Companion.context
 import com.example.dayplanner.databinding.ListAddMapBinding
-import com.example.dayplanner.ui.list.ListFragmentDirections
-import com.example.dayplanner.ui.list_add.ListAddFragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -75,7 +71,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker at last known location (It's not that important) and move the camera
-
         getCurrentLocation()
 
         // This listener was adapted from
@@ -91,6 +86,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             var address: String? = null
             if (!addresses.isNullOrEmpty()) {
                 address = addresses.get(0)?.getAddressLine(0) //0 to obtain first possible address
+            } else {
+                Toast.makeText(this, "Invalid marker location: could not find an address.", Toast.LENGTH_LONG).show()
             }
 
             if (address != null) {
@@ -103,6 +100,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 //remove previously placed Marker
                 newMarker?.remove()
 
+                // Replace the search string too
+                binding.mapSearchText.setText(title)
+
                 //place marker where user just clicked
                 newMarker = mMap.addMarker(
                     MarkerOptions().position(point).title(title)
@@ -112,8 +112,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        binding.mapSearchSubmit.setOnClickListener() {
+            val geocoder = Geocoder(binding.root.context, Locale.getDefault())
+            val searchString = binding.mapSearchText.text.toString()
+            val addresses = geocoder.getFromLocationName(searchString, 1)
+            if (!addresses.isNullOrEmpty()) {
+                val lat = addresses[0].latitude
+                val lon = addresses[0].longitude
+                val point = LatLng(lat, lon)
+
+                title = addresses[0].getAddressLine(0)
+                // remove any old markers to avoid confusion
+                newMarker?.remove()
+
+                // Replace the search string too
+                binding.mapSearchText.setText(title)
+
+                // add a marker so the user knows what's going on
+                newMarker = mMap.addMarker(
+                    MarkerOptions().position(point).title(searchString)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                )
+                newMarker?.showInfoWindow()
+                // Also move the camera
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(point))
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, 15F))
+            } else {
+                Toast.makeText(this, "Invalid search: could not find an address.", Toast.LENGTH_LONG).show()
+            }
+        }
+
     }
 
+    // Logic from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun getCurrentLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
@@ -133,11 +164,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.d("my special tag", "Error: Null")
                     } else {
                         var coordinates = LatLng(40.0, 74.0)
+//                        var lat = 40.0
+//                        var lon = 74.0
                         if (location != null) {
                             coordinates = LatLng(location!!.latitude, location!!.longitude)
+//                            lat = location!!.latitude
+//                            lon = location!!.longitude
                         }
                         newMarker = mMap.addMarker(MarkerOptions().position(coordinates).title(""))
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15F))
                     }
                 }
             } else {
@@ -150,12 +186,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
-    // from https://www.youtube.com/watch?v=mwzKYIB9cQs
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun checkPermissions() : Boolean {
         return (ActivityCompat.checkSelfPermission(this,
             android.Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -165,6 +202,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 == PackageManager.PERMISSION_GRANTED)
     }
 
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     private fun requestPermission() {
         ActivityCompat.requestPermissions(this, arrayOf(
             android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -173,6 +211,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    // Again, from https://www.youtube.com/watch?v=mwzKYIB9cQs
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -181,7 +220,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
             if (grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
-                Log.d("my special tag", "Granted")
                 getCurrentLocation()
             } else {
                 Log.d("my special tag", "Denied. TODO: do something if denied.")

@@ -272,7 +272,8 @@ class ListAddFragment() : Fragment() {
             setup(listAdapterPosition)
             // DO NOT reset the listAdapterPosition yet, as navigating back
             // to the list fragment needs to update the recyclerView
-        } else if (cameFromMapsActivity) {
+        }
+        if (cameFromMapsActivity) {
             // Load values from cache when navigating back from the MapsActivity
             val sharedPrefs = context?.getSharedPreferences("ListAdd", Context.MODE_PRIVATE)
             binding.evtTitle.setText(sharedPrefs?.getString("evtTitle", ""))
@@ -304,9 +305,9 @@ class ListAddFragment() : Fragment() {
             }
 
             // Handle information from map activity
-            if (location != "") { // Location is companion object
+            if (location != null) { // Location is companion object
                 binding.evtLocation.setText(location)
-                location = "" // Do this because it could autofill the next time list_add is opened
+                location = null // Do this because it could autofill the next time list_add is opened
             } else {
                 binding.evtLocation.setText(sharedPrefs?.getString("evtLocation", ""))
             }

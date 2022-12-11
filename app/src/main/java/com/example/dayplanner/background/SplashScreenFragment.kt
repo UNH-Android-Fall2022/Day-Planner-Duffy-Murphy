@@ -48,7 +48,7 @@ open class SplashScreenFragment : Fragment() {
                         dotString += "."
                     }
                     binding.loadingText.text = dotString
-                    i = (i + 1) % (num_dots + 1)
+                    i = (i + 1) % (num_dots + 1) // i = 0, 1, 2, or 3
                     if (DB_PULL_COMPLETED) {
                         if (appWasJustStarted) {
                             val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()

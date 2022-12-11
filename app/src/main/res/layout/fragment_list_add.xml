@@ -74,6 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@color/black"
                 android:textSize="@dimen/list_add_text_size"
                 android:text="@string/start_time" />
 
@@ -112,6 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/list_add_text_size"
+                android:textColor="@color/black"
                 android:textAlignment="center"
                 android:text="@string/evt_recurring"
                 android:layout_marginTop="4dp" />

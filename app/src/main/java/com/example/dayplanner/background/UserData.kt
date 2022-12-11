@@ -6,13 +6,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
 import com.example.dayplanner.MainActivity.Companion.context
 import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.User
 import com.example.dayplanner.data.eventList
+import com.example.dayplanner.ui.login.LoginFragmentDirections
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject

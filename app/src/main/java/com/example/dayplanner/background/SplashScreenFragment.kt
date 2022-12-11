@@ -53,6 +53,7 @@ open class SplashScreenFragment : Fragment() {
                         if (appWasJustStarted) {
                             val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()
                             findNavController().navigate(action)
+                            appWasJustStarted = false
                         } else {
                             val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationSettings()
                             findNavController().navigate(action)

@@ -8,6 +8,7 @@ import android.window.SplashScreen
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.DB_PULL_COMPLETED
+import com.example.dayplanner.MainActivity.Companion.appWasJustStarted
 import com.example.dayplanner.databinding.SplashScreenBinding
 import com.example.dayplanner.background.SplashScreenFragmentDirections
 import kotlinx.coroutines.*
@@ -49,8 +50,13 @@ open class SplashScreenFragment : Fragment() {
                     binding.loadingText.text = dotString
                     i = (i + 1) % (num_dots + 1)
                     if (DB_PULL_COMPLETED) {
-                        val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationSettings()
-                        findNavController().navigate(action)
+                        if (appWasJustStarted) {
+                            val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()
+                            findNavController().navigate(action)
+                        } else {
+                            val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationSettings()
+                            findNavController().navigate(action)
+                        }
                     }
                 }
             }

@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         lateinit var context: Context
         var listAdapterPosition: Int = -1
         var location: String? = null
+        var appWasJustStarted = true
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         context = this

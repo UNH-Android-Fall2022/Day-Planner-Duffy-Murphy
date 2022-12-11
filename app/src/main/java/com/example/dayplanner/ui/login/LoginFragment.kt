@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
+import com.example.dayplanner.background.Session.Companion.login
 import com.example.dayplanner.databinding.FragmentLoginBinding
-import com.example.dayplanner.background.UserData.Companion.login
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult

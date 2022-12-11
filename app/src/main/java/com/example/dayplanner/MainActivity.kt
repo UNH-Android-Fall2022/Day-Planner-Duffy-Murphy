@@ -88,9 +88,9 @@ class MainActivity : AppCompatActivity() {
         location = this.intent.extras?.getString("loc")
         // Crude way to check if we are returning from the MapsActivity
         if (location != null) {
+            cameFromMapsActivity = true
             val navController = findNavController(R.id.nav_host_fragment_activity_main)
             navController.navigate(R.id.navigation_list_add)
-            cameFromMapsActivity = true
         }
         this.intent.extras?.clear()
     }

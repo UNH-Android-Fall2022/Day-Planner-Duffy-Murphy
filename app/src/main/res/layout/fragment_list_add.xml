@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/list_add_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,14 +17,14 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_logo"
-        android:layout_marginTop="@dimen/list_add_big_margin"
-        android:scaleX="3"
-        android:scaleY="3" />
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_logo"
+            android:layout_marginTop="@dimen/list_add_big_margin"
+            android:scaleX="3"
+            android:scaleY="3" />
 
         <EditText
             android:id="@+id/evt_title"
@@ -84,13 +85,14 @@
                 android:textSize="20sp"
                 android:text="@string/switch_default_text" />
 
-            <TextView
+            <Button
                 android:id="@+id/evt_start_time"
                 android:visibility="gone"
+                android:backgroundTint="@color/app_blue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/list_add_spacing"
-                android:textSize="@dimen/list_add_text_size"
+                android:textSize="19dp"
                 android:text="@string/default_time" />
         </LinearLayout>
 
@@ -123,32 +125,41 @@
                 android:textSize="20sp" />
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/evt_location"
-            android:textSize="@dimen/list_add_text_size"
-            android:maxLines="1"
-            android:maxLength="50"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/list_add_padding_and_margin"
-            android:paddingRight="@dimen/list_add_padding_and_margin"
             android:layout_marginLeft="@dimen/list_add_padding_and_margin"
             android:layout_marginRight="@dimen/list_add_padding_and_margin"
-            android:layout_marginTop="@dimen/list_add_spacing"
-            android:background="@drawable/border"
-            android:hint="@string/evt_location"
-            android:visibility="visible" />
+            android:layout_marginTop="@dimen/list_add_spacing">
 
-        <TextView
-            android:id="@+id/evt_location_link"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/find_a_location"
-            android:textSize="23dp"
-            android:layout_marginTop="@dimen/list_add_spacing"
-            android:textColor="@color/steel_blue"
-            android:textAlignment="center"
-            />
+            <EditText
+                android:id="@+id/evt_location"
+                android:textSize="@dimen/list_add_text_size"
+                android:maxLines="1"
+                android:maxLength="50"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/list_add_padding_and_margin"
+                android:paddingRight="@dimen/list_add_padding_and_margin"
+
+                android:background="@drawable/border"
+                android:hint="@string/evt_location"
+                android:visibility="visible"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageButton
+                android:id="@+id/evt_location_link"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="1dp"
+                android:src="@drawable/ic_baseline_add_location_alt_24"
+                app:layout_constraintRight_toRightOf="@id/evt_location"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/list_add_map_button"
+                app:flow_verticalAlign="center"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
             android:id="@+id/list_add_submit"

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.dayplanner.*
 import com.example.dayplanner.background.Session.Companion.login
@@ -83,7 +84,8 @@ class LoginFragment : Fragment() {
                 }
 
             login()
-            val action = LoginFragmentDirections.actionNavigationLoginToNavigationSettings()
+            // New: navigate to splash screen
+            val action = LoginFragmentDirections.actionNavigationLoginToNavigationSplashScreen()
             findNavController().navigate(action)
         } else {
             // Sign in failed. If response is null the user canceled the

@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         lateinit var context: Context
         var listAdapterPosition: Int = -1
         var location: String? = null
+        var appWasJustStarted = true
+        var cameFromMapsActivity = false
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         context = this
@@ -54,13 +56,19 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_list, R.id.navigation_planner, R.id.navigation_settings, R.id.navigation_login
+                R.id.navigation_list,
+                R.id.navigation_planner,
+                R.id.navigation_settings,
+                R.id.navigation_login,
+                R.id.navigation_list_add,
+                R.id.navigation_splash_screen
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         createNotificationChannel()
+
 
         val timeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG)
         Log.d(TAG, "Current time and day: ${timeFormat.format(Date())}")
@@ -82,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         if (location != null) {
             val navController = findNavController(R.id.nav_host_fragment_activity_main)
             navController.navigate(R.id.navigation_list_add)
+            cameFromMapsActivity = true
         }
         this.intent.extras?.clear()
     }

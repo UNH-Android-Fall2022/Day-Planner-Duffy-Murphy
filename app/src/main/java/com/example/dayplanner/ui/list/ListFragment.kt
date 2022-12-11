@@ -53,7 +53,7 @@ open class ListFragment : Fragment() {
             val uid = FirebaseAuth.getInstance().currentUser?.uid
             if (uid != null) {
                 val db = Firebase.firestore
-                val event = eventList.get(listAdapterPosition)
+                val event = eventList[listAdapterPosition]
                 db.collection("Users/${uid}/events")
                     .whereEqualTo("eventName", event.eventName)
                     .whereEqualTo("startTime", event.startTime)

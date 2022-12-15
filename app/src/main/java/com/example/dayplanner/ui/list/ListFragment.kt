@@ -1,6 +1,9 @@
 package com.example.dayplanner.ui.list
 
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +13,18 @@ import com.example.dayplanner.databinding.FragmentListBinding
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dayplanner.MainActivity.Companion.appWasJustStarted
+import com.example.dayplanner.MainActivity.Companion.evtListFileName
 import com.example.dayplanner.MainActivity.Companion.listAdapterPosition
+import com.example.dayplanner.MainActivity.Companion.numEventListProperties
 import com.example.dayplanner.background.Alarms
+import com.example.dayplanner.data.Event
 import com.example.dayplanner.data.eventList
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.io.File
+import java.io.InputStream
+import java.util.*
 
 
 open class ListFragment : Fragment() {
@@ -35,9 +44,36 @@ open class ListFragment : Fragment() {
         val root: View = binding.root
 
         // This is the default (initial) page. Handle user sign in with splash screen
-        if (FirebaseAuth.getInstance().currentUser != null && appWasJustStarted) {
-            val action = ListFragmentDirections.actionNavigationListToNavigationSplashScreen()
-            findNavController().navigate(action)
+        if (appWasJustStarted) {
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                val action = ListFragmentDirections.actionNavigationListToNavigationSplashScreen()
+                findNavController().navigate(action)
+            } else {
+                // NEW: Get data from internal storage
+                val directory = context?.filesDir!!
+                val eventFile: File = File(directory, evtListFileName)
+                if (eventFile.exists()) {
+                    val lineList = eventFile.readLines()
+                    var line = 0
+                    val maxLine = lineList.size
+                    if (maxLine % numEventListProperties != 0) {
+                        Toast.makeText(context, "Error: could not load events from storage.", Toast.LENGTH_LONG).show()
+                    } else {
+                        while (line + numEventListProperties <= maxLine) {
+                            val format = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+                            val startTime: Date = format.parse(lineList[line])
+                            val duration: Int = lineList[line+1].toInt()
+                            val eventName = lineList[line+2]
+                            val location = lineList[line+3]
+                            val recurring: Int = lineList[line+4].toInt()
+
+                            eventList.add(Event(startTime, duration, eventName, location, recurring))
+                            line += numEventListProperties
+                        }
+                    }
+                }
+                appWasJustStarted = false
+            }
         }
 
         updateRecyclerView()

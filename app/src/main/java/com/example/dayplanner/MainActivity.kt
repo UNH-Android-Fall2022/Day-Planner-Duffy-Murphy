@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.StatFs
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -15,10 +17,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.dayplanner.background.Alarms
 import com.example.dayplanner.background.Session.Companion.startup
 import com.example.dayplanner.data.User
+import com.example.dayplanner.data.eventList
 import com.example.dayplanner.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.io.File
 import java.text.DateFormat
 import java.util.*
 
@@ -41,6 +46,8 @@ class MainActivity : AppCompatActivity() {
         var location: String? = null
         var appWasJustStarted = true
         var cameFromMapsActivity = false
+        val numEventListProperties = 5
+        val evtListFileName = "EventList.txt"
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         context = this
@@ -109,6 +116,36 @@ class MainActivity : AppCompatActivity() {
             notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // NEW: Save data to internal storage if user is not signed in
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            // Check if there is enough storage space
+            // Since this is time consuming we will just overestimate - 1 KB per each event
+            // Adapted from https://stackoverflow.com/questions/8133417/android-get-free-size-of-internal-external-memory
+            val path = context.filesDir
+            val stat = StatFs(path.path)
+            val blockSize = stat.blockSizeLong
+            val availableBlocks = stat.availableBlocksLong
+            val kilobytesAvailable = availableBlocks * blockSize / 1024
+            if (eventList.size < kilobytesAvailable.toInt()) {
+                // The following is adapted from https://stackoverflow.com/questions/35444264/how-do-i-write-to-a-file-in-kotlin
+                File(context.filesDir, evtListFileName).printWriter().use { out ->
+                    eventList.forEach {
+                        out.println(it.startTime.toString()) // startTime is Date()?
+                        out.println(it.duration.toString()) // duration is Int
+                        out.println(it.eventName) // String
+                        out.println(it.location) // String
+                        out.println(it.recurring.toString()) // Int
+                    }
+                }
+            } else {
+                // Not enough kilobytes available
+                // No need to make a toast since the user is closing the app anyways
+            }
         }
     }
 }

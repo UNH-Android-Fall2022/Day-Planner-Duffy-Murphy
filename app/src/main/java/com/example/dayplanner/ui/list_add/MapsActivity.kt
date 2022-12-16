@@ -161,7 +161,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 fusedLocationProviderClient.lastLocation.addOnCompleteListener(this) { task ->
                     location = task.result
                     if (location == null) {
-                        Log.d("my special tag", "Error: Null")
+                        // Error
                     } else {
                         var coordinates = LatLng(40.0, 74.0)
 //                        var lat = 40.0
@@ -177,7 +177,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             } else {
-                Log.d("my special tag", "Turn on location")
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(intent)
             }
@@ -222,7 +221,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
                 getCurrentLocation()
             } else {
-                Log.d("my special tag", "Denied. TODO: do something if denied.")
+                // Denied. TODO: do something if denied.
             }
         }
     }

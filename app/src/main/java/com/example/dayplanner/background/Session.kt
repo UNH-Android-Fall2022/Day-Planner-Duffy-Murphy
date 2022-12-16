@@ -46,12 +46,11 @@ class Session {
                                     eventList.add(event)
                             }
                         }
-                        DB_PULL_COMPLETED = true
 
                         Log.d(TAG, "Setting alarms")
                         //Needs to be called in order so this function can work
                         setAllAlarms()
-                    }else {
+                    } else {
                         // We need to clear it in the app because Firestore's TTL feature
                         // Can take up to 72 hours
                         Log.d(TAG, "Events last cleared before today began. Clearing all events")
@@ -70,9 +69,11 @@ class Session {
                                 .document(user!!.uid)
                                 .set(it, SetOptions.merge())
                                 .addOnSuccessListener {
-                                    Log.d(TAG, "Successfully updated clear date") }
+                                    Log.d(TAG, "Successfully updated clear date")
+                                }
                         }
                     }
+                    DB_PULL_COMPLETED = true // End of on success listener
                 }
                 .addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting documents: ", exception)
@@ -94,7 +95,7 @@ class Session {
 
                     Log.d(TAG, "Getting events from database")
                     //Needs to be called in order so certain functions work
-                    getEvents(uid)
+                    getEvents(uid) // DB_PULL_COMPLETED set in here
                 }
                 .addOnFailureListener { exception ->
                     Log.w(TAG, "Error getting user: ", exception)
@@ -114,7 +115,7 @@ class Session {
                 }
                 Log.d(TAG, "Getting user from database")
                 getUser(user.uid)
-                DB_PULL_COMPLETED = true
+//                DB_PULL_COMPLETED = true
             }
         }
 

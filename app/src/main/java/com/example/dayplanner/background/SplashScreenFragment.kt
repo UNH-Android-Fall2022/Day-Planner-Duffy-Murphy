@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import android.window.SplashScreen
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -40,16 +41,25 @@ open class SplashScreenFragment : Fragment() {
             withContext(Dispatchers.Main){
                 var i = 1
                 val num_dots = 3
+                var time_waited: Double = 0.0 // Timeout after 5sec
                 val theText = binding.loadingText.text.toString()
                 while(true) {
-                    delay(600L)
+                    delay(500L)
+                    time_waited += 0.5
                     var dotString = theText
                     for(x in 1..i) {
                         dotString += "."
                     }
                     binding.loadingText.text = dotString
                     i = (i + 1) % (num_dots + 1) // i = 0, 1, 2, or 3
-                    if (DB_PULL_COMPLETED) {
+
+                    if (time_waited > 5) {
+                        appWasJustStarted = false
+                        DB_PULL_COMPLETED = true // Does not cause the else if to execute
+                        Toast.makeText(context,"Network error: database fetch timed out.", Toast.LENGTH_LONG)
+                        val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()
+                        findNavController().navigate(action)
+                    } else if (DB_PULL_COMPLETED) {
                         if (appWasJustStarted) {
                             appWasJustStarted = false
                             val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()

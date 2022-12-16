@@ -53,12 +53,12 @@ open class SplashScreenFragment : Fragment() {
                     binding.loadingText.text = dotString
                     i = (i + 1) % (num_dots + 1) // i = 0, 1, 2, or 3
 
-                    if (time_waited > 5) {
+                    if (time_waited > 5.0) {
                         appWasJustStarted = false
                         DB_PULL_COMPLETED = true // Does not cause the else if to execute
-                        Toast.makeText(context,"Network error: database fetch timed out.", Toast.LENGTH_LONG)
                         val action = SplashScreenFragmentDirections.actionNavigationSplashScreenToNavigationList()
                         findNavController().navigate(action)
+                        Toast.makeText(context,"Network error: database fetch timed out.", Toast.LENGTH_LONG).show()
                     } else if (DB_PULL_COMPLETED) {
                         if (appWasJustStarted) {
                             appWasJustStarted = false
@@ -72,7 +72,6 @@ open class SplashScreenFragment : Fragment() {
                 }
             }
         }
-
         return root
     }
 
